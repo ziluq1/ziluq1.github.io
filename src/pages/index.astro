@@ -1,0 +1,821 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const projects = [
+  {
+    year: "2026",
+    title: "Course Graph",
+    tags: ["TypeScript", "Graph"],
+    blurb: "A visual planner that maps CS prerequisites so you can see the path before you pick the semester.",
+  },
+  {
+    year: "2025",
+    title: "Trace Room",
+    tags: ["Python", "Viz"],
+    blurb: "Step-through visualizer for recursion, sorting, and search — built to make algorithms feel tangible.",
+  },
+  {
+    year: "2025",
+    title: "Quiet Notes",
+    tags: ["Astro", "CRDT"],
+    blurb: "A small realtime notebook with almost no chrome. Share a room, keep the lights low, write together.",
+  },
+];
+
+const skills = [
+  "Java",
+  "Python",
+  "TypeScript",
+  "C",
+  "Astro",
+  "React",
+  "SQL",
+  "Git",
+];
+
+const hobbies = [
+  {
+    title: "Sketching",
+    blurb: "Loose interface drawings before anything gets built. Boxes, arrows, and the occasional lamp.",
+  },
+  {
+    title: "Night sky",
+    blurb: "Watching for meteors and learning the bright constellations when the room is actually dark.",
+  },
+  {
+    title: "Small builds",
+    blurb: "Weekend toys: a tiny tool, a visual for a homework problem, something with one obvious switch.",
+  },
+];
+
+const lately = [
+  {
+    when: "This season",
+    title: "This portfolio",
+    blurb: "A hanging mark, a cord, and a night sky that only shows up after the room goes dark.",
+  },
+  {
+    when: "Coursework",
+    title: "Graphs and traces",
+    blurb: "Mapping prerequisites and stepping through algorithms until the picture is obvious.",
+  },
+  {
+    when: "On the side",
+    title: "Quiet Notes",
+    blurb: "A shared notebook with almost no chrome, still in the early sketches.",
+  },
+];
+---
+
+<Layout
+  title="Evan Ye — CS Portfolio"
+  description="Computer science portfolio for Evan Ye. Pull the cord to switch the lights."
+>
+  <div class="room">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="stars" id="stars" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="mark" href="#top">EY</a>
+      <nav>
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#hobbies">Hobbies</a>
+        <a href="#lately">Lately</a>
+        <a href="#resume">Resume</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="fixture" id="fixture">
+        <div class="lamp">
+          <div class="plaque">
+            <p class="plaque-mark">EY</p>
+            <p class="plaque-name">Evan Ye</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pull-group">
+        <div class="cord-motion">
+          <span class="pull-line" id="pull-line"></span>
+          <button
+            class="pull"
+            id="pull"
+            type="button"
+            aria-pressed="false"
+            aria-label="Pull the cord to turn on dark mode"
+          >
+            <span class="handle"></span>
+          </button>
+        </div>
+        <aside class="cord-note" id="hint">
+          <p>pull the<br />cord!</p>
+          <svg viewBox="0 0 72 32" aria-hidden="true">
+            <path d="M2 18 C18 8 38 10 58 16" />
+            <path class="tip" d="M58 16 L46 8 L48 20 Z" />
+          </svg>
+        </aside>
+      </div>
+
+      <div class="intro">
+        <p class="kicker">Computer Science</p>
+        <h1>Evan Ye</h1>
+        <p class="lede">
+          Student, builder, and occasional electrician of this page.
+        </p>
+        <a class="scroll" href="#about">See the work</a>
+      </div>
+    </section>
+
+    <main>
+      <section class="panel about" id="about">
+        <p class="kicker">About</p>
+        <h2>I like systems that still have a little analog in them.</h2>
+        <div class="about-grid">
+          <p>
+            I’m Evan — CS student interested in how software feels in the hand:
+            interfaces you can tug on, programs you can watch think, tools with
+            a clear on and off.
+          </p>
+          <p>
+            Most days that means coursework, small tools, and interfaces that
+            still have a switch you can find in the dark.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel work" id="work">
+        <p class="kicker">Selected work</p>
+        <ul class="projects">
+          {
+            projects.map((project) => (
+              <li>
+                <article class="project">
+                  <div class="project-meta">
+                    <span>{project.year}</span>
+                    <span>{project.tags.join(" · ")}</span>
+                  </div>
+                  <h3>{project.title}</h3>
+                  <p>{project.blurb}</p>
+                </article>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="panel skills" id="skills">
+        <p class="kicker">Toolkit</p>
+        <ul class="skill-list">
+          {skills.map((skill) => <li>{skill}</li>)}
+        </ul>
+      </section>
+
+      <section class="panel hobbies" id="hobbies">
+        <p class="kicker">Hobbies</p>
+        <h2>What I do when the compiler is quiet.</h2>
+        <ul class="projects">
+          {
+            hobbies.map((hobby) => (
+              <li>
+                <article class="project">
+                  <h3>{hobby.title}</h3>
+                  <p>{hobby.blurb}</p>
+                </article>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="panel lately" id="lately">
+        <p class="kicker">What I’ve been up to</p>
+        <h2>A short log of the current season.</h2>
+        <ul class="projects">
+          {
+            lately.map((item) => (
+              <li>
+                <article class="project">
+                  <div class="project-meta">
+                    <span>{item.when}</span>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.blurb}</p>
+                </article>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="panel resume" id="resume">
+        <p class="kicker">Resume</p>
+        <h2>The one-page version.</h2>
+        <p>
+          Name, studies, projects, and the toolkit — ready to save.
+        </p>
+        <a class="download" href="/evan-ye-resume.pdf" download>
+          Download resume
+        </a>
+      </section>
+
+      <section class="panel contact" id="contact">
+        <p class="kicker">Contact</p>
+        <h2>Leave a note on the desk.</h2>
+        <p>
+          For internships, class projects, or something odd that needs a pull
+          switch — say hello.
+        </p>
+        <a class="mail" href="mailto:evan.ye@example.com">evan.ye@example.com</a>
+      </section>
+    </main>
+
+    <footer>
+      <span>© {new Date().getFullYear()} Evan Ye</span>
+      <button class="again" id="again" type="button">Pull again</button>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .room {
+    position: relative;
+    min-height: 100svh;
+  }
+
+  .glow {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 42% 38% at 50% 28%, var(--glow), transparent 70%);
+    transition: background 700ms ease;
+  }
+
+  .nav,
+  .hero,
+  main,
+  footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 6vw;
+  }
+
+  .mark {
+    font-family: var(--serif);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.85rem 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  nav a {
+    text-decoration: none;
+    opacity: 0.72;
+  }
+
+  nav a:hover {
+    opacity: 1;
+  }
+
+  .hero {
+    --pull: 0px;
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 6vw 3rem;
+  }
+
+  .room {
+    overflow-x: clip;
+  }
+
+  .fixture {
+    position: relative;
+    width: 220px;
+    margin: 6rem auto 0;
+  }
+
+  .pull-line {
+    width: 2px;
+    background: currentColor;
+    transform-origin: top center;
+  }
+
+  .lamp {
+    position: relative;
+  }
+
+  .pull-group {
+    position: absolute;
+    top: 0;
+    right: clamp(2rem, 9vw, 8rem);
+    height: calc(250px + var(--pull));
+    width: 28px;
+  }
+
+  .cord-motion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 28px;
+    height: 100%;
+    transform-origin: top center;
+    animation: cord-sway 4.5s ease-in-out infinite;
+  }
+
+  .pull-group.dragging .cord-motion {
+    animation-play-state: paused;
+  }
+
+  .pull-line {
+    flex: 1 1 auto;
+    width: 2px;
+    min-height: 48px;
+    margin: 0;
+    opacity: 0.92;
+  }
+
+  .plaque {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 1.6rem 1.2rem 1.35rem;
+    background: #f8f3ea;
+    color: #1c1915;
+    box-shadow:
+      0 18px 50px rgba(0, 0, 0, 0.28),
+      0 2px 0 rgba(255, 255, 255, 0.35) inset;
+    transition:
+      filter 700ms ease,
+      background 700ms ease,
+      color 700ms ease,
+      transform 500ms ease;
+    transform-origin: top center;
+    animation: sway 7s ease-in-out infinite;
+  }
+
+  :global(body[data-theme="dark"]) .plaque {
+    background: #14151c;
+    color: #f3ecdf;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  }
+
+  .plaque-mark,
+  .plaque-name {
+    margin: 0;
+  }
+
+  .plaque-mark {
+    font-family: var(--serif);
+    font-size: clamp(4.2rem, 14vw, 5.6rem);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+  }
+
+  .plaque-name {
+    margin-top: 0.7rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pull {
+    width: 28px;
+    height: 46px;
+    margin-top: -2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: grab;
+    touch-action: none;
+    flex-shrink: 0;
+  }
+
+  .pull:active {
+    cursor: grabbing;
+  }
+
+  .handle {
+    display: block;
+    width: 16px;
+    height: 46px;
+    margin: 0 auto;
+    border-radius: 3px 3px 999px 999px;
+    background: linear-gradient(#3a342c, #111);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .cord-note {
+    position: absolute;
+    right: 24px;
+    bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: max-content;
+    pointer-events: none;
+    color: #6f675e;
+  }
+
+  .cord-note svg {
+    display: block;
+    width: 46px;
+    height: 22px;
+    overflow: visible;
+  }
+
+  .cord-note path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .cord-note .tip {
+    fill: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .cord-note p {
+    margin: 0;
+    font-family: "Patrick Hand", "Segoe Print", cursive;
+    font-size: 1.05rem;
+    line-height: 0.95;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  :global(body[data-theme="dark"]) .cord-note {
+    color: #ddd6cb;
+  }
+
+  .intro {
+    max-width: 36rem;
+    margin: 2.4rem auto 0;
+    text-align: center;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+
+  h1 {
+    margin: 0.15rem 0 0.8rem;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 0.9;
+  }
+
+  h2 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.15;
+  }
+
+  .kicker {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .lede {
+    margin: 0 auto 1.4rem;
+    max-width: 28rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .scroll {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel {
+    padding: 5rem 6vw;
+    border-top: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+  }
+
+  .about-grid {
+    display: grid;
+    gap: 1rem 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    max-width: 52rem;
+  }
+
+  .about-grid p,
+  .project p,
+  .contact p {
+    margin: 0;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .projects {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .project {
+    padding: 1.4rem 1.3rem;
+    background: color-mix(in srgb, var(--card) 80%, transparent);
+    border: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
+  }
+
+  .project-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.55rem;
+  }
+
+  .project h3 {
+    margin: 0 0 0.45rem;
+    font-size: 1.7rem;
+  }
+
+  .skill-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1.2rem 0 0;
+    padding: 0;
+  }
+
+  .skill-list li {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  }
+
+  .mail {
+    display: inline-block;
+    margin-top: 1.2rem;
+    font-family: var(--serif);
+    font-size: 1.6rem;
+  }
+
+  .download {
+    display: inline-block;
+    margin-top: 1.4rem;
+    padding: 0.75rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .download:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.4rem 6vw 2rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .again {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @keyframes sway {
+    0%,
+    100% {
+      transform: rotate(-0.6deg);
+    }
+    50% {
+      transform: rotate(0.7deg);
+    }
+  }
+
+  @keyframes cord-sway {
+    0%,
+    100% {
+      transform: rotate(-1.1deg);
+    }
+    50% {
+      transform: rotate(1.1deg);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .nav {
+      padding-inline: 1.25rem;
+    }
+
+    nav {
+      gap: 0.9rem;
+    }
+
+    .fixture {
+      width: 190px;
+      margin: 5rem auto 0;
+    }
+
+    .pull-group {
+      right: 1.25rem;
+      height: calc(230px + var(--pull));
+    }
+  }
+</style>
+
+<script>
+  const body = document.body;
+  const hero = document.getElementById("top");
+  const pullGroup = document.querySelector(".pull-group");
+  const pull = document.getElementById("pull");
+  const again = document.getElementById("again");
+  const stars = document.getElementById("stars");
+  const THRESHOLD = 48;
+  let dragging = false;
+  let startY = 0;
+  let pullPx = 0;
+  let toggledThisDrag = false;
+  let meteorTimer = 0;
+
+  function rand(min: number, max: number) {
+    return min + Math.random() * (max - min);
+  }
+
+  function setPull(px: number) {
+    pullPx = Math.max(0, Math.min(px, 140));
+    hero?.style.setProperty("--pull", `${pullPx}px`);
+  }
+
+  function isDark() {
+    return body.dataset.theme === "dark";
+  }
+
+  function spawnMeteor() {
+    if (!stars) return;
+    const star = document.createElement("span");
+    const dur = rand(1.1, 2.6);
+    star.className = "star";
+    star.style.setProperty("--tilt", `${rand(-8, 8)}deg`);
+    star.style.setProperty("--drift", `${rand(-36, 36)}px`);
+    star.style.setProperty("--dur", `${dur}s`);
+    star.style.setProperty("--delay", `${rand(0, 0.45)}s`);
+    star.style.top = `${rand(4, 92)}%`;
+    star.style.width = `${rand(90, 240)}px`;
+    star.style.height = `${rand(1.5, 3.5)}px`;
+    stars.appendChild(star);
+    window.setTimeout(() => star.remove(), (dur + 0.5) * 1000);
+  }
+
+  function stopMeteors() {
+    window.clearTimeout(meteorTimer);
+    meteorTimer = 0;
+    stars?.replaceChildren();
+  }
+
+  function queueMeteor() {
+    spawnMeteor();
+    meteorTimer = window.setTimeout(queueMeteor, rand(180, 900));
+  }
+
+  function showerStars() {
+    stopMeteors();
+    const burst = 8 + Math.floor(rand(0, 14));
+    for (let i = 0; i < burst; i += 1) spawnMeteor();
+    queueMeteor();
+  }
+
+  function setTheme(dark: boolean) {
+    const next = dark ? "dark" : "light";
+    const changed = body.dataset.theme !== next;
+    body.dataset.theme = next;
+    pull?.setAttribute("aria-pressed", String(dark));
+    pull?.setAttribute(
+      "aria-label",
+      dark ? "Pull the cord to turn on light mode" : "Pull the cord to turn on dark mode",
+    );
+    if (!changed) return;
+    if (dark) showerStars();
+    else stopMeteors();
+  }
+
+  function toggleTheme() {
+    setTheme(!isDark());
+  }
+
+  function springBack() {
+    const start = pullPx;
+    const t0 = performance.now();
+    const dur = 280;
+
+    function frame(now: number) {
+      const t = Math.min(1, (now - t0) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setPull(start * (1 - eased));
+      if (t < 1) requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function onPointerDown(event: PointerEvent) {
+    dragging = true;
+    toggledThisDrag = false;
+    startY = event.clientY;
+    pullGroup?.classList.add("dragging");
+    pull?.setPointerCapture(event.pointerId);
+  }
+
+  function onPointerMove(event: PointerEvent) {
+    if (!dragging) return;
+    const dy = event.clientY - startY;
+    setPull(dy);
+    if (!toggledThisDrag && dy > THRESHOLD) {
+      toggledThisDrag = true;
+      toggleTheme();
+    }
+  }
+
+  function onPointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    pullGroup?.classList.remove("dragging");
+    if (!toggledThisDrag) toggleTheme();
+    springBack();
+  }
+
+  pull?.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp);
+  window.addEventListener("pointercancel", onPointerUp);
+  pull?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleTheme();
+    }
+  });
+  again?.addEventListener("click", () => {
+    toggleTheme();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  setTheme(false);
+</script>

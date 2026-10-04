@@ -1,0 +1,120 @@
+:root {
+  --paper: #efe6d6;
+  --paper-deep: #e4d8c4;
+  --ink: #1c1915;
+  --ink-soft: #4a433a;
+  --warm: #f6c98a;
+  --line: #1c1915;
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "Instrument Sans", "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--fg);
+  background: var(--bg);
+  transition:
+    background 700ms ease,
+    color 700ms ease;
+}
+
+body[data-theme="light"] {
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --muted: var(--ink-soft);
+  --card: #f7f1e6;
+  --glow: rgba(255, 214, 140, 0.45);
+}
+
+body[data-theme="dark"] {
+  --bg: #0b0c12;
+  --fg: #f4efe6;
+  --muted: #d2c8b6;
+  --card: #16171e;
+  --glow: rgba(160, 190, 255, 0.12);
+}
+
+body[data-theme="dark"] .room {
+  color: var(--fg);
+}
+
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] p,
+body[data-theme="dark"] a,
+body[data-theme="dark"] li,
+body[data-theme="dark"] span {
+  text-shadow: 0 1px 10px rgba(11, 12, 18, 0.85);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--warm);
+  color: var(--ink);
+}
+
+.stars {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.star {
+  --tilt: 0deg;
+  --dur: 1.3s;
+  position: absolute;
+  left: -18vw;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #fff 40%, #ffe7b0);
+  opacity: 0;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.95));
+  animation: streak var(--dur) linear var(--delay, 0s) both;
+}
+
+@keyframes streak {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(0) rotate(var(--tilt));
+  }
+  6% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(120vw) translateY(var(--drift, 0px)) rotate(var(--tilt));
+  }
+}
