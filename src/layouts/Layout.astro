@@ -18,7 +18,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <!-- Production-only policy so the dev toolbar can still load its own scripts. -->
+    <!-- Production policy. Build adds hashes so the inline cord and drag scripts can run. -->
     {
       import.meta.env.PROD && (
         <meta
