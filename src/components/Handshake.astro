@@ -305,12 +305,13 @@
 </style>
 
 <script>
-  // Public shared counter. Abacus is the source of truth; localStorage is only a display cache.
+  // Shared counter. Abacus adds 1 per hit, and the browser cannot send its own count.
+  // This host cannot store a visitor, so the same person can handshake more than once.
   const COUNTER_URL = "https://abacus.jasoncameron.dev";
   const COUNTER_PATH = "ziluq1.github.io/handshake";
   const HANDSHAKE_CACHE = "evan-virtual-handshake-shared";
 
-  // About 1 in 10 handshakes also shows the thin ring.
+  // Animation timing. The rare ring does not change the recorded count.
   const SPECIAL_CHANCE = 0.1;
   // Matches the 1200ms hand animation, plus time for the sparks to finish.
   const HANDSHAKE_MS = 1280;
@@ -321,6 +322,7 @@
   const SPARK_EXTRA = 3;
   const COUNT_TIMEOUT_MS = 8000;
 
+  // Elements and whether a handshake is already in progress.
   const handshakeBtn = document.getElementById("handshake-btn");
   const handshakeCount = document.getElementById("handshake-count");
   const handshakeStage = document.getElementById("handshake-stage");
@@ -330,6 +332,7 @@
   let handshakePlaying = false;
   let audioCtx: AudioContext | null = null;
 
+  // Read the shared count. localStorage only fills the display if the counter is unreachable.
   function parseCount(value: unknown) {
     const count = typeof value === "number" ? value : Number(value);
     if (!Number.isSafeInteger(count) || count < 0) return null;
@@ -406,6 +409,7 @@
     renderHandshake(false);
   }
 
+  // Hands, sparks, and the rare pop. A second click waits until this finishes.
   function playPerfectPop() {
     try {
       const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
