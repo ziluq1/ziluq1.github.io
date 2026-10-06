@@ -132,6 +132,12 @@ import PullCord from "./PullCord.astro";
       width: 168px;
       margin: 5.5rem auto 0;
     }
+
+    /* Phones skip the full-screen hero so the intro sits closer to the projects. */
+    .hero {
+      min-height: auto;
+      padding-bottom: 1rem;
+    }
   }
 
   /* Short landscape screens keep the name on screen. */
