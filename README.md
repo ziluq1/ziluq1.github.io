@@ -1,6 +1,6 @@
 # Evan Ye
 
-Computer science portfolio. Pull the cord to switch the lights.
+Computer science portfolio.
 
 Live site: https://ziluq1.github.io/
 
