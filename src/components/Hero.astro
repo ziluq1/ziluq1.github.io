@@ -20,7 +20,7 @@ import PullCord from "./PullCord.astro";
     <p class="kicker">Computer Science</p>
     <h1>Evan Ye</h1>
     <p class="lede">
-      Hi! I’m Evan, a Yale Computer Science undergraduate who likes to build things, solve problems,<br />
+      Hi! I’m Evan, a Yale Computer Science undergraduate who likes to build things, solve problems,<span class="lede-gap">&nbsp;</span><br class="lede-break" />
       and mess around with code.
     </p>
   </div>
@@ -109,7 +109,25 @@ import PullCord from "./PullCord.astro";
     overflow-wrap: break-word;
   }
 
+  /* The gap is only for phones. Wider screens break the line instead. */
+  .lede-gap {
+    display: none;
+  }
+
+  /* Phones wrap the sentence. Wider screens keep the second line starting at the left. */
   @media (max-width: 700px) {
+    .lede-gap {
+      display: inline;
+    }
+
+    .lede-break {
+      display: none;
+    }
+
+    .lede {
+      text-wrap: pretty;
+    }
+
     .fixture {
       width: 168px;
       margin: 5.5rem auto 0;
