@@ -1,0 +1,387 @@
+<!-- Drag or click to toggle dark mode, then scroll to projects. -->
+<div class="pull-group">
+  <div class="cord-motion">
+    <span class="pull-line" id="pull-line"></span>
+    <button
+      class="pull"
+      id="pull"
+      type="button"
+      aria-pressed="false"
+      aria-label="Pull the cord to turn on dark mode"
+    >
+      <span class="handle"></span>
+    </button>
+  </div>
+  <aside class="cord-note" id="hint">
+    <p>pull the<br />cord!</p>
+    <svg viewBox="0 0 72 32" aria-hidden="true">
+      <path d="M2 18 C18 8 38 10 58 16" />
+      <path class="tip" d="M58 16 L46 8 L48 20 Z" />
+    </svg>
+  </aside>
+</div>
+
+<style>
+  .pull-group {
+    position: absolute;
+    top: 0;
+    right: clamp(2rem, 9vw, 8rem);
+    z-index: 2;
+    height: calc(250px + var(--pull));
+    width: 28px;
+  }
+
+  .cord-motion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 28px;
+    height: 100%;
+    transform-origin: top center;
+    animation: cord-sway 7s ease-in-out infinite;
+  }
+
+  .pull-group.dragging .cord-motion {
+    animation-play-state: paused;
+  }
+
+  @keyframes cord-sway {
+    0%,
+    100% {
+      transform: rotate(-2.4deg);
+    }
+    50% {
+      transform: rotate(2.4deg);
+    }
+  }
+
+  .pull-line {
+    flex: 1 1 auto;
+    width: 2px;
+    min-height: 48px;
+    margin: 0;
+    background: currentColor;
+    transform-origin: top center;
+    opacity: 0.92;
+  }
+
+  .pull {
+    width: 44px;
+    height: 48px;
+    margin: -2px -8px 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: grab;
+    touch-action: none;
+    flex-shrink: 0;
+  }
+
+  .pull:active {
+    cursor: grabbing;
+  }
+
+  .pull:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  .handle {
+    display: block;
+    width: 16px;
+    height: 46px;
+    margin: 0 auto;
+    border-radius: 3px 3px 999px 999px;
+    background: linear-gradient(#3a342c, #111);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .cord-note {
+    position: absolute;
+    right: 24px;
+    bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: max-content;
+    pointer-events: none;
+    color: #6f675e;
+  }
+
+  .cord-note svg {
+    display: block;
+    width: 46px;
+    height: 22px;
+    overflow: visible;
+  }
+
+  .cord-note path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .cord-note .tip {
+    fill: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .cord-note p {
+    margin: 0;
+    font-family: "Patrick Hand", "Segoe Print", cursive;
+    font-size: 1.05rem;
+    line-height: 0.95;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  :global(body[data-theme="dark"]) .cord-note {
+    color: #ddd6cb;
+  }
+
+  @media (max-width: 700px) {
+    .pull-group {
+      right: max(1.25rem, env(safe-area-inset-right));
+      height: calc(76px + var(--pull));
+    }
+
+    .cord-note {
+      right: 30px;
+      bottom: 6px;
+    }
+
+    .cord-note p {
+      font-size: 0.92rem;
+    }
+
+    .cord-note svg {
+      width: 34px;
+      height: 16px;
+    }
+  }
+
+  @media (max-height: 520px) {
+    .pull-group {
+      height: calc(min(200px, 46vh) + var(--pull));
+    }
+  }
+
+  /* The short phone cord wins over the short-viewport cord. */
+  @media (max-width: 700px) and (max-height: 520px) {
+    .pull-group {
+      right: max(1.25rem, env(safe-area-inset-right));
+      height: calc(76px + var(--pull));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cord-motion {
+      transition: none;
+      animation: none;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  // How far a drag must travel before the lights toggle, and how far a click can drift.
+  const PULL_THRESHOLD = 48;
+  const CLICK_SLOP = 6;
+  const MAX_PULL_PX = 140;
+  const SPRING_MS = 280;
+  const TUG_MS = 520;
+
+  const body = document.body;
+  const hero = document.getElementById("top");
+  const pullGroup = document.querySelector(".pull-group");
+  const pull = document.getElementById("pull");
+  const stars = document.getElementById("stars");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
+  let moved = 0;
+  let pullPx = 0;
+  let toggledThisDrag = false;
+  let meteorTimer = 0;
+  let tugToken = 0;
+
+  function rand(min: number, max: number) {
+    return min + Math.random() * (max - min);
+  }
+
+  function setPull(px: number) {
+    pullPx = Math.max(0, Math.min(px, MAX_PULL_PX));
+    hero?.style.setProperty("--pull", `${pullPx}px`);
+  }
+
+  function isDark() {
+    return body.dataset.theme === "dark";
+  }
+
+  // Shooting stars only while dark mode is on.
+  function spawnMeteor() {
+    if (!stars || reducedMotion) return;
+    const star = document.createElement("span");
+    const dur = rand(1.1, 2.6);
+    star.className = "star";
+    star.style.setProperty("--tilt", `${rand(-8, 8)}deg`);
+    star.style.setProperty("--drift", `${rand(-36, 36)}px`);
+    star.style.setProperty("--dur", `${dur}s`);
+    star.style.setProperty("--delay", `${rand(0, 0.45)}s`);
+    star.style.top = `${rand(4, 92)}%`;
+    star.style.width = `${rand(90, 240)}px`;
+    star.style.height = `${rand(1.5, 3.5)}px`;
+    stars.appendChild(star);
+    window.setTimeout(() => star.remove(), (dur + 0.5) * 1000);
+  }
+
+  function stopMeteors() {
+    window.clearTimeout(meteorTimer);
+    meteorTimer = 0;
+    stars?.replaceChildren();
+  }
+
+  function queueMeteor() {
+    if (reducedMotion) return;
+    spawnMeteor();
+    meteorTimer = window.setTimeout(queueMeteor, rand(180, 900));
+  }
+
+  function showerStars() {
+    stopMeteors();
+    if (reducedMotion) return;
+    const burst = 8 + Math.floor(rand(0, 14));
+    for (let i = 0; i < burst; i += 1) spawnMeteor();
+    queueMeteor();
+  }
+
+  function setTheme(dark: boolean) {
+    const next = dark ? "dark" : "light";
+    const changed = body.dataset.theme !== next;
+    body.dataset.theme = next;
+    pull?.setAttribute("aria-pressed", String(dark));
+    pull?.setAttribute(
+      "aria-label",
+      dark ? "Pull the cord to turn on light mode" : "Pull the cord to turn on dark mode",
+    );
+    if (!changed) return;
+    if (dark) showerStars();
+    else stopMeteors();
+  }
+
+  function toggleTheme() {
+    setTheme(!isDark());
+  }
+
+  // Completed pulls scroll to projects without reloading or changing the URL.
+  function scrollToProjects() {
+    const target = document.getElementById("projects");
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top,
+      behavior: reducedMotion ? "instant" : "smooth",
+    });
+  }
+
+  function cancelTug() {
+    tugToken += 1;
+  }
+
+  function springBack() {
+    const token = ++tugToken;
+    const start = pullPx;
+    const t0 = performance.now();
+
+    function frame(now: number) {
+      if (token !== tugToken) return;
+      const t = Math.min(1, (now - t0) / SPRING_MS);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setPull(start * (1 - eased));
+      if (t < 1) requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // A click plays a short tug. A drag springs back to the resting length.
+  function playTug() {
+    if (reducedMotion) return;
+    const token = ++tugToken;
+    const t0 = performance.now();
+
+    function frame(now: number) {
+      if (token !== tugToken) return;
+      const t = Math.min(1, (now - t0) / TUG_MS);
+      let y = 0;
+      if (t < 0.34) {
+        const u = t / 0.34;
+        y = 16 * (1 - Math.pow(1 - u, 3));
+      } else if (t < 0.62) {
+        const u = (t - 0.34) / 0.28;
+        y = 16 + (2 - 16) * u;
+      } else if (t < 0.8) {
+        const u = (t - 0.62) / 0.18;
+        y = 2 + (7 - 2) * u;
+      } else {
+        const u = (t - 0.8) / 0.2;
+        y = 7 * (1 - u);
+      }
+      setPull(y);
+      if (t < 1) requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function handlePointerDown(event: PointerEvent) {
+    cancelTug();
+    dragging = true;
+    toggledThisDrag = false;
+    moved = 0;
+    startX = event.clientX;
+    startY = event.clientY;
+    pullGroup?.classList.add("dragging");
+    pull?.setPointerCapture(event.pointerId);
+  }
+
+  function handlePointerMove(event: PointerEvent) {
+    if (!dragging) return;
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    moved = Math.max(moved, Math.hypot(dx, dy));
+    setPull(dy);
+    if (!toggledThisDrag && dy > PULL_THRESHOLD) {
+      toggledThisDrag = true;
+      toggleTheme();
+    }
+  }
+
+  function handlePointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    pullGroup?.classList.remove("dragging");
+    const clicked = moved < CLICK_SLOP;
+    if (!toggledThisDrag) toggleTheme();
+    if (clicked) playTug();
+    else springBack();
+    scrollToProjects();
+  }
+
+  pull?.addEventListener("pointerdown", handlePointerDown);
+  window.addEventListener("pointermove", handlePointerMove);
+  window.addEventListener("pointerup", handlePointerUp);
+  window.addEventListener("pointercancel", handlePointerUp);
+  pull?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      playTug();
+      toggleTheme();
+      scrollToProjects();
+    }
+  });
+</script>

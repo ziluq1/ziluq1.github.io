@@ -1,0 +1,32 @@
+---
+import ProjectCard from "./ProjectCard.astro";
+import { projects } from "../data/projects";
+---
+
+<!-- Cards are generated from src/data/projects.ts. -->
+<div id="projects">
+  {
+    projects.map((project, index) => (
+      <section class="panel project-section">
+        {index === 0 && <p class="kicker">Projects</p>}
+        <ProjectCard project={project} />
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  #projects {
+    scroll-margin-top: 0;
+  }
+
+  .project-section {
+    padding-block: 2.4rem;
+  }
+
+  @media (max-width: 700px) {
+    .project-section {
+      padding-block: 1.6rem;
+    }
+  }
+</style>

@@ -1,0 +1,93 @@
+<!-- Fixed bottom-right control. It appears near the end of hobbies and scrolls back to the top. -->
+<button class="to-top" id="to-top" type="button" aria-label="Back to top" tabindex="-1" aria-hidden="true">
+  <span aria-hidden="true">↑</span>
+  Top
+</button>
+
+<style>
+  .to-top {
+    position: fixed;
+    z-index: 5;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.4rem 0.2rem;
+    border: 0;
+    background: transparent;
+    color: var(--fg, #111);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+  .to-top.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .to-top:hover {
+    transform: translateY(-2px);
+  }
+
+  .to-top:focus-visible {
+    outline: 2px solid var(--fg, #111);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .to-top,
+    .to-top:hover,
+    .to-top.is-visible {
+      transition: none;
+      animation: none;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  // How far through hobbies the reader must scroll before this button appears.
+  const HOBBIES_REVEAL = 0.62;
+
+  const toTop = document.getElementById("to-top");
+  const hobbies = document.getElementById("hobbies");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function syncToTop() {
+    if (!toTop) return;
+    const rect = hobbies?.getBoundingClientRect();
+    const show = rect
+      ? rect.top + rect.height * HOBBIES_REVEAL < window.innerHeight
+      : false;
+    toTop.classList.toggle("is-visible", show);
+    toTop.setAttribute("aria-hidden", show ? "false" : "true");
+    if (show) toTop.removeAttribute("tabindex");
+    else toTop.setAttribute("tabindex", "-1");
+  }
+
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: reducedMotion ? "instant" : "smooth",
+    });
+  }
+
+  syncToTop();
+  window.addEventListener("scroll", syncToTop, { passive: true });
+  window.addEventListener("resize", syncToTop);
+  toTop?.addEventListener("click", scrollToTop);
+</script>

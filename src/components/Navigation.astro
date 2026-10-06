@@ -1,0 +1,84 @@
+---
+import { RESUME_PATH } from "../data/site";
+---
+
+<!-- Site links. Resume opens the placeholder image in a new tab. -->
+<header class="nav">
+  <a class="mark" href="#top">EY</a>
+  <nav>
+    <a href="#projects">Projects</a>
+    <a href="#hobbies">Hobbies</a>
+    <a href="#contact">Contact</a>
+    <a href={RESUME_PATH} target="_blank" rel="noopener noreferrer">Resume</a>
+  </nav>
+</header>
+
+<style>
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding:
+      max(1.25rem, env(safe-area-inset-top))
+      max(6vw, env(safe-area-inset-right))
+      1.25rem
+      max(6vw, env(safe-area-inset-left));
+  }
+
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+    font-family: var(--serif);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+    gap: 0.85rem 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  nav a:hover {
+    opacity: 1;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.1rem;
+    text-decoration: none;
+    opacity: 0.72;
+  }
+
+  nav a:focus-visible,
+  .mark:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  /* Keep every link on one line on a phone. */
+  @media (max-width: 700px) {
+    .nav {
+      padding-inline: max(0.85rem, env(safe-area-inset-left));
+    }
+
+    nav {
+      flex-wrap: nowrap;
+      gap: 0.1rem 0.35rem;
+      font-size: clamp(0.58rem, 2.7vw, 0.68rem);
+      letter-spacing: 0.02em;
+    }
+  }
+</style>

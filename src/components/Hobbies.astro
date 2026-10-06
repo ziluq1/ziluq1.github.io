@@ -1,0 +1,208 @@
+---
+import { hobbyPhotos } from "../data/hobbies";
+---
+
+<section class="panel hobbies" id="hobbies">
+  <p class="kicker">Hobbies</p>
+  <h2>I like tennis, hiking, photography, and traveling.</h2>
+  <div class="pinboard" id="pinboard">
+    {
+      hobbyPhotos.map((photo) => (
+        <figure
+          class="polaroid"
+          style={`--rot: ${photo.rotation}deg; --x: ${photo.x}; --y: ${photo.y}; --w: ${photo.w}; --tx: ${photo.tx}; --ty: ${photo.ty}; --tw: ${photo.tw}; --mx: ${photo.mx}; --my: ${photo.my}; --mw: ${photo.mw};`}
+        >
+          <img src={photo.src} alt={photo.alt} draggable="false" />
+        </figure>
+      ))
+    }
+    <p class="drag-hint">⌖ Drag items to rearrange</p>
+  </div>
+</section>
+
+<style>
+  .pinboard {
+    position: relative;
+    height: 1280px;
+    margin-top: 1.6rem;
+  }
+
+  .polaroid {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    margin: 0;
+    padding: 10px 10px 28px;
+    background: #f7f3ea;
+    box-shadow: 0 10px 22px rgba(28, 25, 21, 0.18);
+    transform: rotate(var(--rot));
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  .polaroid img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .polaroid:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  .polaroid:hover {
+    z-index: 40;
+    transform: rotate(calc(var(--rot) * 0.25)) scale(1.04);
+    box-shadow: 0 16px 32px rgba(28, 25, 21, 0.28);
+  }
+
+  .polaroid.dragging,
+  .polaroid.dragging:hover {
+    z-index: 80;
+    cursor: grabbing;
+    transform: rotate(var(--rot));
+    transition: none;
+    box-shadow: 0 18px 36px rgba(28, 25, 21, 0.32);
+  }
+
+  .drag-hint {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* Tablet uses a tighter scramble. Phones use the compact one. */
+  @media (max-width: 1100px) {
+    .pinboard {
+      height: 1180px;
+    }
+
+    .polaroid {
+      left: var(--tx);
+      top: var(--ty);
+      width: var(--tw);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .hobbies {
+      padding-top: 1.45rem;
+      padding-bottom: 1.15rem;
+    }
+
+    .hobbies h2 {
+      margin-bottom: 0.35rem;
+    }
+
+    .pinboard {
+      height: 640px;
+      margin-top: 0.25rem;
+    }
+
+    .polaroid {
+      left: var(--mx);
+      top: var(--my);
+      width: var(--mw);
+    }
+
+    .drag-hint {
+      right: 0;
+      bottom: 0.15rem;
+      max-width: 100%;
+      font-size: 0.72rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .polaroid,
+    .polaroid:hover,
+    .polaroid.dragging,
+    .polaroid.dragging:hover {
+      transition: none;
+      transform: rotate(var(--rot));
+    }
+  }
+</style>
+
+<script>
+  const pinboard = document.getElementById("pinboard");
+  const polaroids = pinboard ? [...pinboard.querySelectorAll<HTMLElement>(".polaroid")] : [];
+  let topZ = polaroids.length;
+
+  // Pointer events cover mouse and touch. Cards stay inside the gallery.
+  polaroids.forEach((card, index) => {
+    card.style.zIndex = String(index + 1);
+    let offsetX = 0;
+    let offsetY = 0;
+    let active = false;
+
+    const raise = () => {
+      topZ += 1;
+      card.style.zIndex = String(topZ);
+    };
+
+    card.addEventListener("pointerenter", raise);
+    card.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      const board = pinboard?.getBoundingClientRect();
+      const rect = card.getBoundingClientRect();
+      if (!board) return;
+      active = true;
+      offsetX = event.clientX - rect.left;
+      offsetY = event.clientY - rect.top;
+      card.style.left = `${rect.left - board.left}px`;
+      card.style.top = `${rect.top - board.top}px`;
+      card.classList.add("dragging");
+      raise();
+      card.setPointerCapture(event.pointerId);
+    });
+
+    card.addEventListener("pointermove", (event) => {
+      if (!active || !pinboard) return;
+      const board = pinboard.getBoundingClientRect();
+      const maxX = board.width - card.offsetWidth;
+      const maxY = board.height - card.offsetHeight;
+      const x = Math.min(Math.max(0, event.clientX - board.left - offsetX), maxX);
+      const y = Math.min(Math.max(0, event.clientY - board.top - offsetY), maxY);
+      card.style.left = `${x}px`;
+      card.style.top = `${y}px`;
+    });
+
+    const endDrag = () => {
+      active = false;
+      card.classList.remove("dragging");
+    };
+    card.addEventListener("pointerup", endDrag);
+    card.addEventListener("pointercancel", endDrag);
+  });
+
+  function clampDraggedCards() {
+    if (!pinboard) return;
+    polaroids.forEach((card) => {
+      if (!card.style.left.endsWith("px")) return;
+      const maxX = Math.max(0, pinboard.clientWidth - card.offsetWidth);
+      const maxY = Math.max(0, pinboard.clientHeight - card.offsetHeight);
+      const x = Math.min(Math.max(0, parseFloat(card.style.left) || 0), maxX);
+      const y = Math.min(Math.max(0, parseFloat(card.style.top) || 0), maxY);
+      card.style.left = `${x}px`;
+      card.style.top = `${y}px`;
+    });
+  }
+
+  window.addEventListener("resize", clampDraggedCards);
+</script>

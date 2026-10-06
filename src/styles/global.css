@@ -1,3 +1,4 @@
+/* Theme colors and font stacks. Light and dark values live on the body below. */
 :root {
   --paper: #efe6d6;
   --paper-deep: #e4d8c4;
@@ -10,6 +11,7 @@
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
+/* Base page styles. */
 *,
 *::before,
 *::after {
@@ -18,6 +20,12 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 html,
@@ -35,12 +43,16 @@ body {
     color 700ms ease;
 }
 
+/* Light and dark palettes, including handshake spark colors. */
 body[data-theme="light"] {
   --bg: var(--paper);
   --fg: var(--ink);
   --muted: var(--ink-soft);
   --card: #f7f1e6;
   --glow: rgba(255, 214, 140, 0.45);
+  --spark-ink: #111;
+  --spark-paper: #fff;
+  --handshake-ring: #111;
 }
 
 body[data-theme="dark"] {
@@ -49,6 +61,9 @@ body[data-theme="dark"] {
   --muted: #d2c8b6;
   --card: #16171e;
   --glow: rgba(160, 190, 255, 0.12);
+  --spark-ink: #fff;
+  --spark-paper: #fff;
+  --handshake-ring: #fff;
 }
 
 body[data-theme="dark"] .room {
@@ -84,6 +99,60 @@ button {
   color: var(--ink);
 }
 
+/* Shared headings and the padding used by each main section. */
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+h1 {
+  max-width: 100%;
+  margin: 0.15rem 0 0.8rem;
+  font-size: clamp(2.6rem, 8vw, 5.5rem);
+  line-height: 0.9;
+  overflow-wrap: break-word;
+}
+
+h2 {
+  max-width: 100%;
+  margin: 0 0 1rem;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.15;
+  overflow-wrap: break-word;
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel {
+  padding:
+    5rem
+    max(6vw, env(safe-area-inset-right))
+    5rem
+    max(6vw, env(safe-area-inset-left));
+  border-top: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+}
+
+@media (max-width: 700px) {
+  .panel {
+    padding:
+      2.5rem
+      max(1.1rem, env(safe-area-inset-right))
+      2.5rem
+      max(1.1rem, env(safe-area-inset-left));
+  }
+}
+
+/* Shooting stars. The pull cord adds them only while dark mode is on. */
 .stars {
   pointer-events: none;
   position: fixed;

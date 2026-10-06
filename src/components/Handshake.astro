@@ -1,0 +1,501 @@
+<section class="handshake" id="handshake" aria-labelledby="handshake-title">
+  <h2 id="handshake-title">Leave a handshake</h2>
+  <div class="handshake-stage" id="handshake-stage" aria-hidden="true">
+    <span class="hand hand-left">
+      <img src="/images/handshake-hand-right.png" alt="" draggable="false" />
+    </span>
+    <span class="hand hand-right">
+      <img src="/images/handshake-hand-left.png" alt="" draggable="false" />
+    </span>
+    <span class="shockwave"></span>
+  </div>
+  <div class="handshake-row">
+    <button class="handshake-btn" id="handshake-btn" type="button" aria-label="Handshake">
+      Handshake
+    </button>
+    <p class="handshake-readout">
+      Virtual Handshake
+      <span class="handshake-count" id="handshake-count">0</span>
+    </p>
+  </div>
+</section>
+
+<style>
+  .handshake {
+    padding:
+      2.4rem
+      max(6vw, env(safe-area-inset-right))
+      max(2.8rem, env(safe-area-inset-bottom))
+      max(6vw, env(safe-area-inset-left));
+    border-top: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+    text-align: center;
+  }
+
+  .handshake h2 {
+    margin-bottom: 0.8rem;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+  }
+
+  .handshake-stage {
+    position: relative;
+    width: min(320px, 100%);
+    height: 92px;
+    margin: 0 auto 0.85rem;
+  }
+
+  .hand {
+    position: absolute;
+    top: 16px;
+    display: flex;
+    align-items: center;
+    width: 108px;
+    height: 60px;
+    color: var(--fg);
+  }
+
+  .hand-left {
+    left: 0;
+    justify-content: flex-end;
+  }
+
+  .hand-right {
+    right: 0;
+    justify-content: flex-start;
+  }
+
+  .hand img {
+    height: 58px;
+    width: auto;
+    max-width: none;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .shockwave {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    z-index: 3;
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--handshake-ring, #111);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    box-shadow: none;
+    filter: none;
+    text-shadow: none;
+  }
+
+  :global(body[data-theme="dark"]) .shockwave {
+    text-shadow: none;
+  }
+
+  :global(body[data-theme="dark"] .spark) {
+    text-shadow: none;
+  }
+
+  /* Sparks are created in JavaScript, so they cannot use scoped class names. */
+  :global(.spark) {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    z-index: 4;
+    width: 3px;
+    height: 3px;
+    margin: -1px 0 0 -1px;
+    pointer-events: none;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    animation: spark-fly 420ms cubic-bezier(0.16, 0.72, 0.28, 1) forwards;
+  }
+
+  :global(.spark-dark) {
+    background: var(--spark-ink, #111);
+  }
+
+  :global(.spark-light) {
+    background: var(--spark-paper, #fff);
+  }
+
+  :global(.spark-line) {
+    width: 6px;
+    height: 2px;
+    margin: -1px 0 0 -3px;
+  }
+
+  /* Hands meet for 1200ms. The button unlocks slightly later, after the sparks. */
+  .handshake-stage.is-meeting .hand-left {
+    animation: handshake-left 1200ms ease;
+  }
+
+  .handshake-stage.is-meeting .hand-right {
+    animation: handshake-right 1200ms ease;
+  }
+
+  .handshake-stage.is-shockwave .shockwave {
+    animation: shockwave 640ms ease-out 400ms both;
+  }
+
+  .handshake-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    max-width: 100%;
+  }
+
+  .handshake-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    padding: 0.7rem 1.7rem;
+    border: 2px solid #111;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .handshake-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .handshake-btn:active {
+    transform: translateY(0);
+    opacity: 0.72;
+  }
+
+  .handshake-btn:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 3px;
+  }
+
+  .handshake-btn:disabled {
+    cursor: default;
+    opacity: 0.72;
+  }
+
+  .handshake-btn:disabled:hover,
+  .handshake-btn:disabled:active {
+    transform: none;
+    background: transparent;
+    opacity: 0.72;
+  }
+
+  .handshake-readout {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.3rem;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .handshake-count {
+    display: inline-block;
+    min-width: 1ch;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .handshake-count.is-ticking {
+    animation: handshake-tick 280ms ease;
+  }
+
+  :global(body[data-theme="dark"]) .handshake-btn {
+    border-color: #fff;
+  }
+
+  :global(body[data-theme="dark"]) .handshake-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  :global(body[data-theme="dark"]) .handshake-btn:focus-visible {
+    outline-color: #fff;
+  }
+
+  @keyframes handshake-left {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    32% { transform: translate(72%, 0) rotate(6deg); }
+    46% { transform: translate(78%, 3px) rotate(8deg); }
+    58% { transform: translate(74%, -2px) rotate(5deg); }
+    70% { transform: translate(78%, 2px) rotate(7deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  @keyframes handshake-right {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    32% { transform: translate(-72%, 0) rotate(-6deg); }
+    46% { transform: translate(-78%, 3px) rotate(-8deg); }
+    58% { transform: translate(-74%, -2px) rotate(-5deg); }
+    70% { transform: translate(-78%, 2px) rotate(-7deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  @keyframes spark-fly {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) rotate(var(--rot));
+    }
+    42% {
+      opacity: 1;
+      transform: translate(calc(var(--dx) * 0.48 + var(--ax)), calc(var(--dy) * 0.48 + var(--ay))) rotate(var(--rot));
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+    }
+  }
+
+  @keyframes shockwave {
+    0% {
+      opacity: 0.9;
+      width: 8px;
+      height: 8px;
+    }
+    100% {
+      opacity: 0;
+      width: 128px;
+      height: 128px;
+    }
+  }
+
+  @keyframes handshake-tick {
+    0% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(-3px) scale(1.18); }
+    100% { transform: translateY(0) scale(1); }
+  }
+
+  @media (max-width: 700px) {
+    .handshake {
+      padding:
+        1.6rem
+        max(1.1rem, env(safe-area-inset-right))
+        max(2rem, env(safe-area-inset-bottom))
+        max(1.1rem, env(safe-area-inset-left));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .handshake-btn,
+    .handshake-btn:hover,
+    .handshake-btn:active,
+    .handshake-btn:disabled,
+    .handshake-btn:disabled:hover,
+    .handshake-count,
+    .handshake-count.is-ticking,
+    .hand,
+    .shockwave,
+    :global(.spark) {
+      transition: none;
+      animation: none;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  // Public shared counter. Abacus is the source of truth; localStorage is only a display cache.
+  const COUNTER_URL = "https://abacus.jasoncameron.dev";
+  const COUNTER_PATH = "ziluq1.github.io/handshake";
+  const HANDSHAKE_CACHE = "evan-virtual-handshake-shared";
+
+  // About 1 in 10 handshakes also shows the thin ring.
+  const SPECIAL_CHANCE = 0.1;
+  // Matches the 1200ms hand animation, plus time for the sparks to finish.
+  const HANDSHAKE_MS = 1280;
+  const SPARK_DELAY_MS = 400;
+  const POP_DELAY_MS = 450;
+  // Each handshake throws 3 to 5 sparks.
+  const SPARK_MIN = 3;
+  const SPARK_EXTRA = 3;
+  const COUNT_TIMEOUT_MS = 8000;
+
+  const handshakeBtn = document.getElementById("handshake-btn");
+  const handshakeCount = document.getElementById("handshake-count");
+  const handshakeStage = document.getElementById("handshake-stage");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let handshakeTotal = readCachedHandshake();
+  let handshakePlaying = false;
+  let audioCtx: AudioContext | null = null;
+
+  function parseCount(value: unknown) {
+    const count = typeof value === "number" ? value : Number(value);
+    if (!Number.isSafeInteger(count) || count < 0) return null;
+    return count;
+  }
+
+  function formatCount(value: number) {
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
+  }
+
+  function readCachedHandshake() {
+    try {
+      return parseCount(localStorage.getItem(HANDSHAKE_CACHE)) ?? 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  function cacheHandshake(value: number) {
+    try {
+      localStorage.setItem(HANDSHAKE_CACHE, String(value));
+    } catch {
+      /* The shared counter is the source of truth if this browser cannot cache it. */
+    }
+  }
+
+  // Only the public counter URL is called. The response value is checked before it is shown.
+  async function fetchHandshake(action: "get" | "hit") {
+    const response = await fetch(`${COUNTER_URL}/${action}/${COUNTER_PATH}`, {
+      signal: AbortSignal.timeout(COUNT_TIMEOUT_MS),
+    });
+    if (action === "get" && response.status === 404) return 0;
+    if (!response.ok) throw new Error(String(response.status));
+    const data = (await response.json()) as { value?: unknown };
+    const count = parseCount(data.value);
+    if (count === null) throw new Error("bad count");
+    return count;
+  }
+
+  async function loadSharedHandshake() {
+    try {
+      handshakeTotal = await fetchHandshake("get");
+      cacheHandshake(handshakeTotal);
+      renderHandshake(false);
+    } catch {
+      /* Keep the last shared count if the counter cannot be reached. */
+    }
+  }
+
+  function renderHandshake(pop: boolean) {
+    if (!handshakeCount || !handshakeBtn) return;
+    handshakeCount.textContent = formatCount(handshakeTotal);
+    handshakeBtn.setAttribute(
+      "aria-label",
+      `Handshake. ${formatCount(handshakeTotal)} so far.`,
+    );
+    if (!pop || reducedMotion) return;
+    handshakeCount.classList.remove("is-ticking");
+    void handshakeCount.offsetWidth;
+    handshakeCount.classList.add("is-ticking");
+  }
+
+  async function finishHandshake() {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        handshakeTotal = await fetchHandshake("hit");
+        cacheHandshake(handshakeTotal);
+        renderHandshake(true);
+        return;
+      } catch {
+        /* Retry once, then keep the last shared count. */
+      }
+    }
+    renderHandshake(false);
+  }
+
+  function playPerfectPop() {
+    try {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!Ctx) return;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === "suspended") void audioCtx.resume();
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(620, t);
+      osc.frequency.exponentialRampToValueAtTime(190, t + 0.09);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.04, t + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.12);
+    } catch {
+      /* Sound is optional if the browser blocks audio. */
+    }
+  }
+
+  function unlockHandshake(restoreFocus: boolean) {
+    handshakePlaying = false;
+    if (!handshakeBtn) return;
+    handshakeBtn.disabled = false;
+    if (restoreFocus) handshakeBtn.focus();
+  }
+
+  // Ignore another click until this animation and the counter request finish.
+  function playHandshake(restoreFocus: boolean) {
+    if (!handshakeBtn || handshakePlaying) return;
+    handshakePlaying = true;
+    handshakeBtn.disabled = true;
+    const perfect = Math.random() < SPECIAL_CHANCE;
+    if (reducedMotion || !handshakeStage) {
+      if (perfect) playPerfectPop();
+      void finishHandshake().finally(() => unlockHandshake(restoreFocus));
+      return;
+    }
+    handshakeStage.classList.remove("is-meeting", "is-shockwave");
+    clearSparks();
+    void handshakeStage.offsetWidth;
+    if (perfect) {
+      handshakeStage.classList.add("is-shockwave");
+      window.setTimeout(playPerfectPop, POP_DELAY_MS);
+    }
+    handshakeStage.classList.add("is-meeting");
+    window.setTimeout(spawnSparks, SPARK_DELAY_MS);
+    window.setTimeout(() => {
+      handshakeStage.classList.remove("is-meeting", "is-shockwave");
+      clearSparks();
+      void finishHandshake().finally(() => unlockHandshake(restoreFocus));
+    }, HANDSHAKE_MS);
+  }
+
+  function clearSparks() {
+    handshakeStage?.querySelectorAll(".spark").forEach((spark) => spark.remove());
+  }
+
+  function spawnSparks() {
+    if (!handshakeStage || reducedMotion) return;
+    clearSparks();
+    const count = SPARK_MIN + Math.floor(Math.random() * SPARK_EXTRA);
+    for (let i = 0; i < count; i += 1) {
+      const spark = document.createElement("span");
+      const line = Math.random() < 0.4;
+      const tone = (i + (Math.random() < 0.5 ? 0 : 1)) % 2 === 0 ? "spark-dark" : "spark-light";
+      spark.className = `spark ${tone}${line ? " spark-line" : ""}`;
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.8;
+      const dist = 36 + Math.random() * 26;
+      const arc = (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random() * 8);
+      spark.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
+      spark.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
+      spark.style.setProperty("--ax", `${-Math.sin(angle) * arc}px`);
+      spark.style.setProperty("--ay", `${Math.cos(angle) * arc}px`);
+      spark.style.setProperty("--rot", `${Math.round((angle * 180) / Math.PI)}deg`);
+      handshakeStage.appendChild(spark);
+      spark.addEventListener("animationend", () => spark.remove());
+    }
+  }
+
+  function handleHandshake(event: MouseEvent) {
+    if (handshakePlaying || handshakeBtn?.disabled) return;
+    playHandshake(event.detail === 0);
+  }
+
+  renderHandshake(false);
+  void loadSharedHandshake();
+  handshakeBtn?.addEventListener("click", handleHandshake);
+</script>
