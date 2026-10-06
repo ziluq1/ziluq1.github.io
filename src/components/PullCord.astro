@@ -1,4 +1,4 @@
-<!-- Drag or click to toggle dark mode, then scroll to projects. -->
+<!-- Drag or click to toggle dark mode. The page stays where it is. -->
 <div class="pull-group">
   <div class="cord-motion">
     <span class="pull-line" id="pull-line"></span>
@@ -277,17 +277,6 @@
     setTheme(!isDark());
   }
 
-  // Completed pulls scroll to projects without reloading or changing the URL.
-  function scrollToProjects() {
-    const target = document.getElementById("projects");
-    if (!target) return;
-    const top = target.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({
-      top,
-      behavior: reducedMotion ? "instant" : "smooth",
-    });
-  }
-
   function cancelTug() {
     tugToken += 1;
   }
@@ -369,7 +358,6 @@
     if (!toggledThisDrag) toggleTheme();
     if (clicked) playTug();
     else springBack();
-    scrollToProjects();
   }
 
   pull?.addEventListener("pointerdown", handlePointerDown);
@@ -381,7 +369,6 @@
       event.preventDefault();
       playTug();
       toggleTheme();
-      scrollToProjects();
     }
   });
 </script>
