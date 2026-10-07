@@ -24,13 +24,13 @@ import { hobbyPhotos } from "../data/hobbies";
         </figure>
       ))
     }
-    <p class="pin-hint">
-      <span class="pin-hint-mark" aria-hidden="true">⌖</span>
-      <span>Drag photos to rearrange</span>
-      <span class="pin-hint-mark" aria-hidden="true">+</span>
-      <span>Click photo to enlarge</span>
-    </p>
   </div>
+  <p class="pin-hint">
+    <span class="pin-hint-mark" aria-hidden="true">⌖</span>
+    <span>Drag photos to rearrange</span>
+    <span class="pin-hint-mark" aria-hidden="true">+</span>
+    <span>Click photo to enlarge</span>
+  </p>
 </section>
 
 <dialog class="lightbox" id="hobby-lightbox" aria-labelledby="hobby-lightbox-location">
@@ -120,15 +120,15 @@ import { hobbyPhotos } from "../data/hobbies";
   }
 
   .pin-hint {
-    position: absolute;
-    right: 0;
-    bottom: -2.4rem;
-    z-index: 5;
+    position: relative;
+    z-index: 90;
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
     column-gap: 0.4em;
     row-gap: 0.1em;
-    margin: 0;
+    width: max-content;
+    max-width: 100%;
+    margin: 0.45rem 0 0 auto;
     font-family: var(--mono);
     font-size: 0.72rem;
     line-height: 1.45;
@@ -324,9 +324,7 @@ import { hobbyPhotos } from "../data/hobbies";
     }
 
     .pin-hint {
-      right: 0;
-      bottom: -0.45rem;
-      max-width: 100%;
+      margin-top: 0.3rem;
     }
 
     .lightbox-frame {
@@ -374,6 +372,7 @@ import { hobbyPhotos } from "../data/hobbies";
   const DRAG_SLOP = 8;
 
   const pinboard = document.getElementById("pinboard");
+  const pinHint = document.querySelector<HTMLElement>(".pin-hint");
   const polaroids = pinboard ? [...pinboard.querySelectorAll<HTMLElement>(".polaroid")] : [];
   const dialog = document.getElementById("hobby-lightbox") as HTMLDialogElement | null;
   const lightboxImage = document.getElementById("hobby-lightbox-image") as HTMLImageElement | null;
@@ -385,6 +384,29 @@ import { hobbyPhotos } from "../data/hobbies";
   let opener: HTMLElement | null = null;
   let lockedHtmlOverflow = "";
   let lockedBodyOverflow = "";
+
+  function placeCard(card: HTMLElement, left: number, top: number) {
+    if (!pinboard) return;
+    const maxX = Math.max(0, pinboard.clientWidth - card.offsetWidth);
+    const maxY = Math.max(0, pinboard.clientHeight - card.offsetHeight);
+    const x = Math.min(Math.max(0, left), maxX);
+    let y = Math.min(Math.max(0, top), maxY);
+    card.style.left = `${x}px`;
+    card.style.top = `${y}px`;
+    if (!pinHint) return;
+
+    const photo = card.getBoundingClientRect();
+    const words = pinHint.getBoundingClientRect();
+    const overWords =
+      photo.right > words.left + 1 &&
+      photo.left < words.right - 1 &&
+      photo.bottom > words.top + 1 &&
+      photo.top < words.bottom - 1;
+    if (!overWords) return;
+
+    y = Math.max(0, y - (photo.bottom - words.top + 4));
+    card.style.top = `${y}px`;
+  }
 
   function lockScroll() {
     lockedHtmlOverflow = document.documentElement.style.overflow;
@@ -506,12 +528,11 @@ import { hobbyPhotos } from "../data/hobbies";
       }
 
       const board = pinboard.getBoundingClientRect();
-      const maxX = board.width - card.offsetWidth;
-      const maxY = board.height - card.offsetHeight;
-      const x = Math.min(Math.max(0, event.clientX - board.left - offsetX), maxX);
-      const y = Math.min(Math.max(0, event.clientY - board.top - offsetY), maxY);
-      card.style.left = `${x}px`;
-      card.style.top = `${y}px`;
+      placeCard(
+        card,
+        event.clientX - board.left - offsetX,
+        event.clientY - board.top - offsetY,
+      );
     });
 
     const finishPointer = (cancelled: boolean) => {
@@ -536,15 +557,25 @@ import { hobbyPhotos } from "../data/hobbies";
   function clampDraggedCards() {
     if (!pinboard) return;
     polaroids.forEach((card) => {
-      if (!card.style.left.endsWith("px")) return;
-      const maxX = Math.max(0, pinboard.clientWidth - card.offsetWidth);
-      const maxY = Math.max(0, pinboard.clientHeight - card.offsetHeight);
-      const x = Math.min(Math.max(0, parseFloat(card.style.left) || 0), maxX);
-      const y = Math.min(Math.max(0, parseFloat(card.style.top) || 0), maxY);
-      card.style.left = `${x}px`;
-      card.style.top = `${y}px`;
+      const usingPx = card.style.left.endsWith("px");
+      const left = usingPx ? parseFloat(card.style.left) || 0 : card.offsetLeft;
+      const top = usingPx ? parseFloat(card.style.top) || 0 : card.offsetTop;
+      if (!usingPx) {
+        const before = card.getBoundingClientRect();
+        const words = pinHint?.getBoundingClientRect();
+        const overWords = Boolean(
+          words &&
+            before.right > words.left + 1 &&
+            before.left < words.right - 1 &&
+            before.bottom > words.top + 1 &&
+            before.top < words.bottom - 1,
+        );
+        if (!overWords) return;
+      }
+      placeCard(card, left, top);
     });
   }
 
   window.addEventListener("resize", clampDraggedCards);
+  clampDraggedCards();
 </script>
