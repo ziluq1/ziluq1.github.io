@@ -7,7 +7,7 @@ const hobbyPhotoEntries = [
   {
     src: "/images/s-blob-v1-IMAGE-usyn3kmI2co.jpg",
     location: "Folsom, Louisiana",
-    description: "Close-up picture of Bishop.",
+    description: "Close-up picture of Bison.",
   },
   {
     src: "/images/s-blob-v1-IMAGE-q9BuDDmdfao.jpg",

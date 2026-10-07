@@ -316,6 +316,11 @@ import { hobbyPhotos } from "../data/hobbies";
       left: var(--mx);
       top: var(--my);
       width: var(--mw);
+      touch-action: pan-y;
+    }
+
+    .polaroid-open {
+      touch-action: pan-y;
     }
 
     .pin-hint {
@@ -458,6 +463,7 @@ import { hobbyPhotos } from "../data/hobbies";
     let active = false;
     let dragging = false;
     let ignoreClick = false;
+    let touchPointer = false;
 
     const raise = () => {
       topZ += 1;
@@ -470,6 +476,7 @@ import { hobbyPhotos } from "../data/hobbies";
       active = true;
       dragging = false;
       ignoreClick = false;
+      touchPointer = event.pointerType === "touch";
       startX = event.clientX;
       startY = event.clientY;
     });
@@ -480,6 +487,12 @@ import { hobbyPhotos } from "../data/hobbies";
       const dy = event.clientY - startY;
       if (!dragging) {
         if (dx * dx + dy * dy < DRAG_SLOP * DRAG_SLOP) return;
+        // A mostly vertical swipe on a phone should scroll the page.
+        if (touchPointer && Math.abs(dy) >= Math.abs(dx)) {
+          ignoreClick = true;
+          active = false;
+          return;
+        }
         dragging = true;
         const board = pinboard.getBoundingClientRect();
         const rect = card.getBoundingClientRect();
