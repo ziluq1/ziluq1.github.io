@@ -88,6 +88,6 @@
 
   syncToTop();
   window.addEventListener("scroll", syncToTop, { passive: true });
-  window.addEventListener("resize", syncToTop);
+  window.addEventListener("resize", syncToTop, { passive: true });
   toTop?.addEventListener("click", scrollToTop);
 </script>

@@ -251,9 +251,16 @@ import { hobbyPhotos } from "../data/hobbies";
     font-family: var(--serif);
     font-weight: 400;
     font-size: clamp(1rem, 2.4vw, 1.35rem);
-    font-variation-settings: "opsz" 36, "SOFT" 0, "WONK" 0;
-    line-height: 1.45;
+    line-height: 1.5;
     color: var(--ink);
+  }
+
+  /* Fraunces draws an old-style J. Georgia keeps this letter on the baseline. */
+  :global(.lightbox-j) {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+    font-variation-settings: normal;
+    font-feature-settings: normal;
   }
 
   .lightbox-description {
@@ -369,6 +376,7 @@ import { hobbyPhotos } from "../data/hobbies";
 </style>
 
 <script>
+  // Collage drag and enlarged-photo elements.
   const DRAG_SLOP = 8;
 
   const pinboard = document.getElementById("pinboard");
@@ -382,8 +390,21 @@ import { hobbyPhotos } from "../data/hobbies";
 
   let topZ = polaroids.length;
   let opener: HTMLElement | null = null;
+  let scrollLocked = false;
   let lockedHtmlOverflow = "";
   let lockedBodyOverflow = "";
+
+  function coversHint(card: HTMLElement) {
+    if (!pinHint) return false;
+    const photo = card.getBoundingClientRect();
+    const words = pinHint.getBoundingClientRect();
+    return (
+      photo.right > words.left + 1 &&
+      photo.left < words.right - 1 &&
+      photo.bottom > words.top + 1 &&
+      photo.top < words.bottom - 1
+    );
+  }
 
   function placeCard(card: HTMLElement, left: number, top: number) {
     if (!pinboard) return;
@@ -393,22 +414,19 @@ import { hobbyPhotos } from "../data/hobbies";
     let y = Math.min(Math.max(0, top), maxY);
     card.style.left = `${x}px`;
     card.style.top = `${y}px`;
-    if (!pinHint) return;
+    if (!coversHint(card)) return;
 
     const photo = card.getBoundingClientRect();
-    const words = pinHint.getBoundingClientRect();
-    const overWords =
-      photo.right > words.left + 1 &&
-      photo.left < words.right - 1 &&
-      photo.bottom > words.top + 1 &&
-      photo.top < words.bottom - 1;
-    if (!overWords) return;
-
+    const words = pinHint?.getBoundingClientRect();
+    if (!words) return;
     y = Math.max(0, y - (photo.bottom - words.top + 4));
     card.style.top = `${y}px`;
   }
 
+  // Keep the page still while a photo is enlarged.
   function lockScroll() {
+    if (scrollLocked) return;
+    scrollLocked = true;
     lockedHtmlOverflow = document.documentElement.style.overflow;
     lockedBodyOverflow = document.body.style.overflow;
     document.documentElement.style.overflow = "hidden";
@@ -416,8 +434,26 @@ import { hobbyPhotos } from "../data/hobbies";
   }
 
   function unlockScroll() {
+    if (!scrollLocked) return;
     document.documentElement.style.overflow = lockedHtmlOverflow;
     document.body.style.overflow = lockedBodyOverflow;
+    scrollLocked = false;
+  }
+
+  function setLocationLabel(text: string) {
+    if (!lightboxLocation) return;
+    lightboxLocation.replaceChildren();
+    text.split(/(J)/g).forEach((part) => {
+      if (!part) return;
+      if (part === "J") {
+        const letter = document.createElement("span");
+        letter.className = "lightbox-j";
+        letter.textContent = "J";
+        lightboxLocation.append(letter);
+        return;
+      }
+      lightboxLocation.append(part);
+    });
   }
 
   function openLightbox(button: HTMLElement) {
@@ -427,7 +463,7 @@ import { hobbyPhotos } from "../data/hobbies";
 
     lightboxImage.src = image.currentSrc || image.src;
     lightboxImage.alt = image.alt;
-    lightboxLocation.textContent = button.dataset.location ?? "";
+    setLocationLabel(button.dataset.location ?? "");
 
     const description = button.dataset.description?.trim();
     if (description) {
@@ -560,18 +596,7 @@ import { hobbyPhotos } from "../data/hobbies";
       const usingPx = card.style.left.endsWith("px");
       const left = usingPx ? parseFloat(card.style.left) || 0 : card.offsetLeft;
       const top = usingPx ? parseFloat(card.style.top) || 0 : card.offsetTop;
-      if (!usingPx) {
-        const before = card.getBoundingClientRect();
-        const words = pinHint?.getBoundingClientRect();
-        const overWords = Boolean(
-          words &&
-            before.right > words.left + 1 &&
-            before.left < words.right - 1 &&
-            before.bottom > words.top + 1 &&
-            before.top < words.bottom - 1,
-        );
-        if (!overWords) return;
-      }
+      if (!usingPx && !coversHint(card)) return;
       placeCard(card, left, top);
     });
   }

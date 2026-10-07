@@ -331,6 +331,12 @@
   let handshakeTotal = readCachedHandshake();
   let handshakePlaying = false;
   let audioCtx: AudioContext | null = null;
+  let handshakeTimers: number[] = [];
+
+  function clearHandshakeTimers() {
+    handshakeTimers.forEach((id) => window.clearTimeout(id));
+    handshakeTimers = [];
+  }
 
   // Read the shared count. localStorage only fills the display if the counter is unreachable.
   function parseCount(value: unknown) {
@@ -453,6 +459,7 @@
     if (!handshakeBtn || handshakePlaying) return;
     handshakePlaying = true;
     handshakeBtn.disabled = true;
+    clearHandshakeTimers();
     const perfect = Math.random() < SPECIAL_CHANCE;
     if (reducedMotion || !handshakeStage) {
       if (perfect) playPerfectPop();
@@ -464,15 +471,17 @@
     void handshakeStage.offsetWidth;
     if (perfect) {
       handshakeStage.classList.add("is-shockwave");
-      window.setTimeout(playPerfectPop, POP_DELAY_MS);
+      handshakeTimers.push(window.setTimeout(playPerfectPop, POP_DELAY_MS));
     }
     handshakeStage.classList.add("is-meeting");
-    window.setTimeout(spawnSparks, SPARK_DELAY_MS);
-    window.setTimeout(() => {
-      handshakeStage.classList.remove("is-meeting", "is-shockwave");
-      clearSparks();
-      void finishHandshake().finally(() => unlockHandshake(restoreFocus));
-    }, HANDSHAKE_MS);
+    handshakeTimers.push(window.setTimeout(spawnSparks, SPARK_DELAY_MS));
+    handshakeTimers.push(
+      window.setTimeout(() => {
+        handshakeStage.classList.remove("is-meeting", "is-shockwave");
+        clearSparks();
+        void finishHandshake().finally(() => unlockHandshake(restoreFocus));
+      }, HANDSHAKE_MS),
+    );
   }
 
   function clearSparks() {
