@@ -12,13 +12,32 @@ import { hobbyPhotos } from "../data/hobbies";
           class="polaroid"
           style={`--rot: ${photo.rotation}deg; --x: ${photo.x}; --y: ${photo.y}; --w: ${photo.w}; --tx: ${photo.tx}; --ty: ${photo.ty}; --tw: ${photo.tw}; --mx: ${photo.mx}; --my: ${photo.my}; --mw: ${photo.mw};`}
         >
-          <img src={photo.src} alt={photo.alt} draggable="false" />
+          <button
+            type="button"
+            class="polaroid-open"
+            aria-label={photo.alt}
+            data-location={photo.location}
+            data-description={"description" in photo ? photo.description : undefined}
+          >
+            <img src={photo.src} alt={photo.alt} draggable="false" />
+          </button>
         </figure>
       ))
     }
     <p class="drag-hint">⌖ Drag items to rearrange</p>
   </div>
 </section>
+
+<dialog class="lightbox" id="hobby-lightbox" aria-labelledby="hobby-lightbox-location">
+  <button type="button" class="lightbox-close" aria-label="Close image">×</button>
+  <figure class="lightbox-frame">
+    <img id="hobby-lightbox-image" alt="" />
+    <figcaption>
+      <p id="hobby-lightbox-location" class="lightbox-location"></p>
+      <p id="hobby-lightbox-description" class="lightbox-description" hidden></p>
+    </figcaption>
+  </figure>
+</dialog>
 
 <style>
   .pinboard {
@@ -33,26 +52,42 @@ import { hobbyPhotos } from "../data/hobbies";
     top: var(--y);
     width: var(--w);
     margin: 0;
-    padding: 10px 10px 28px;
-    background: #f7f3ea;
-    box-shadow: 0 10px 22px rgba(28, 25, 21, 0.18);
     transform: rotate(var(--rot));
     cursor: grab;
     touch-action: none;
     user-select: none;
-    transition:
-      transform 220ms ease,
-      box-shadow 220ms ease;
+    transition: transform 220ms ease;
   }
 
-  .polaroid img {
+  .polaroid-open,
+  .lightbox-frame {
+    background: #f7f3ea;
+    box-shadow: 0 10px 22px rgba(28, 25, 21, 0.18);
+  }
+
+  .polaroid-open {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 10px 10px 28px;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: inherit;
+    touch-action: none;
+    transition: box-shadow 220ms ease;
+  }
+
+  .polaroid-open img {
+    display: block;
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
     pointer-events: none;
   }
 
-  .polaroid:focus-visible {
+  .polaroid-open:focus-visible {
     outline: 2px solid var(--fg);
     outline-offset: 3px;
   }
@@ -60,6 +95,9 @@ import { hobbyPhotos } from "../data/hobbies";
   .polaroid:hover {
     z-index: 40;
     transform: rotate(calc(var(--rot) * 0.25)) scale(1.04);
+  }
+
+  .polaroid:hover .polaroid-open {
     box-shadow: 0 16px 32px rgba(28, 25, 21, 0.28);
   }
 
@@ -69,6 +107,10 @@ import { hobbyPhotos } from "../data/hobbies";
     cursor: grabbing;
     transform: rotate(var(--rot));
     transition: none;
+  }
+
+  .polaroid.dragging .polaroid-open,
+  .polaroid.dragging:hover .polaroid-open {
     box-shadow: 0 18px 36px rgba(28, 25, 21, 0.32);
   }
 
@@ -84,6 +126,144 @@ import { hobbyPhotos } from "../data/hobbies";
     color: var(--muted);
     opacity: 0.55;
     pointer-events: none;
+  }
+
+  /* Enlarged polaroid. The frame follows the photo, within one shared size so portraits and landscapes stay in the same family. */
+  .lightbox {
+    display: flex;
+    width: fit-content;
+    max-width: calc(
+      100vw - max(1.25rem, env(safe-area-inset-left)) - max(1.25rem, env(safe-area-inset-right))
+    );
+    max-height: calc(
+      100svh - max(0.5rem, env(safe-area-inset-top)) - max(0.5rem, env(safe-area-inset-bottom))
+    );
+    margin: auto;
+    padding:
+      max(3.5rem, calc(env(safe-area-inset-top) + 3rem))
+      0
+      max(0.75rem, env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .lightbox::backdrop {
+    background: color-mix(in srgb, var(--ink) 78%, transparent);
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: max(0.75rem, env(safe-area-inset-right));
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    text-shadow: none;
+  }
+
+  .lightbox-close:hover {
+    background: #fff;
+  }
+
+  .lightbox-close:focus-visible {
+    outline: 2px solid var(--paper);
+    outline-offset: 3px;
+  }
+
+  .lightbox-frame {
+    --photo-max-width: min(72vw, 32rem);
+    --photo-max-height: min(32rem, calc(100svh - 12.75rem));
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: fit-content;
+    max-width: calc(var(--photo-max-width) + 28px);
+    min-height: 0;
+    margin: 0;
+    padding: 14px 14px 22px;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  .lightbox-frame img {
+    display: block;
+    flex: 0 1 auto;
+    align-self: center;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    max-width: var(--photo-max-width);
+    max-height: var(--photo-max-height);
+    object-fit: contain;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .lightbox-frame figcaption {
+    flex: 0 0 auto;
+    width: 0;
+    min-width: 100%;
+    margin: 0;
+    padding: 0.8rem 0.2rem 0;
+    overflow: visible;
+    text-align: center;
+  }
+
+  .lightbox-location,
+  .lightbox-description {
+    margin: 0;
+    overflow: visible;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-shadow: none;
+    overflow-wrap: break-word;
+  }
+
+  .lightbox-location {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(1rem, 2.4vw, 1.35rem);
+    font-variation-settings: "opsz" 36, "SOFT" 0, "WONK" 0;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .lightbox-description {
+    margin-top: 0.35rem;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+
+  .lightbox-description[hidden] {
+    display: none;
+  }
+
+  :global(body[data-theme="dark"]) .lightbox-location {
+    color: var(--ink);
+    text-shadow: none;
+  }
+
+  :global(body[data-theme="dark"]) .lightbox-description {
+    color: var(--ink-soft);
+    text-shadow: none;
+  }
+
+  :global(body[data-theme="dark"]) .lightbox-close {
+    text-shadow: none;
   }
 
   /* Tablet uses a tighter scramble. Phones use the compact one. */
@@ -126,30 +306,139 @@ import { hobbyPhotos } from "../data/hobbies";
       max-width: 100%;
       font-size: 0.72rem;
     }
+
+    .lightbox-frame {
+      --photo-max-width: min(
+        32rem,
+        calc(
+          100vw - max(1.25rem, env(safe-area-inset-left)) -
+            max(1.25rem, env(safe-area-inset-right)) - 28px
+        )
+      );
+      --photo-max-height: min(48svh, calc(100svh - 12.75rem));
+    }
+  }
+
+  @media (max-height: 520px) {
+    .lightbox-frame {
+      --photo-max-height: calc(100svh - 12.5rem);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .polaroid,
     .polaroid:hover,
     .polaroid.dragging,
-    .polaroid.dragging:hover {
+    .polaroid.dragging:hover,
+    .polaroid-open {
       transition: none;
+    }
+
+    .polaroid,
+    .polaroid:hover,
+    .polaroid.dragging,
+    .polaroid.dragging:hover {
       transform: rotate(var(--rot));
+    }
+
+    .lightbox,
+    .lightbox-close {
+      transition: none;
     }
   }
 </style>
 
 <script>
+  const DRAG_SLOP = 8;
+
   const pinboard = document.getElementById("pinboard");
   const polaroids = pinboard ? [...pinboard.querySelectorAll<HTMLElement>(".polaroid")] : [];
-  let topZ = polaroids.length;
+  const dialog = document.getElementById("hobby-lightbox") as HTMLDialogElement | null;
+  const lightboxImage = document.getElementById("hobby-lightbox-image") as HTMLImageElement | null;
+  const lightboxLocation = document.getElementById("hobby-lightbox-location");
+  const lightboxDescription = document.getElementById("hobby-lightbox-description");
+  const closeButton = dialog?.querySelector<HTMLButtonElement>(".lightbox-close") ?? null;
 
-  // Pointer events cover mouse and touch. Cards stay inside the gallery.
+  let topZ = polaroids.length;
+  let opener: HTMLElement | null = null;
+  let lockedHtmlOverflow = "";
+  let lockedBodyOverflow = "";
+
+  function lockScroll() {
+    lockedHtmlOverflow = document.documentElement.style.overflow;
+    lockedBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+  }
+
+  function unlockScroll() {
+    document.documentElement.style.overflow = lockedHtmlOverflow;
+    document.body.style.overflow = lockedBodyOverflow;
+  }
+
+  function openLightbox(button: HTMLElement) {
+    if (!dialog || !lightboxImage || !lightboxLocation || !lightboxDescription) return;
+    const image = button.querySelector("img");
+    if (!image) return;
+
+    lightboxImage.src = image.currentSrc || image.src;
+    lightboxImage.alt = image.alt;
+    lightboxLocation.textContent = button.dataset.location ?? "";
+
+    const description = button.dataset.description?.trim();
+    if (description) {
+      lightboxDescription.hidden = false;
+      lightboxDescription.textContent = description;
+      dialog.setAttribute("aria-describedby", "hobby-lightbox-description");
+    } else {
+      lightboxDescription.hidden = true;
+      lightboxDescription.textContent = "";
+      dialog.removeAttribute("aria-describedby");
+    }
+
+    opener = button;
+    lockScroll();
+    if (!dialog.open) dialog.showModal();
+    closeButton?.focus();
+  }
+
+  function closeLightbox() {
+    if (dialog?.open) dialog.close();
+  }
+
+  dialog?.addEventListener("close", () => {
+    unlockScroll();
+    lightboxImage?.removeAttribute("src");
+    opener?.focus();
+    opener = null;
+  });
+
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) closeLightbox();
+  });
+
+  closeButton?.addEventListener("click", () => {
+    closeLightbox();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !dialog?.open) return;
+    closeLightbox();
+  });
+
+  // A short move rearranges the card. A click or tap opens the photo.
   polaroids.forEach((card, index) => {
     card.style.zIndex = String(index + 1);
+    const button = card.querySelector<HTMLElement>(".polaroid-open");
+    if (!button) return;
+
     let offsetX = 0;
     let offsetY = 0;
+    let startX = 0;
+    let startY = 0;
     let active = false;
+    let dragging = false;
+    let ignoreClick = false;
 
     const raise = () => {
       topZ += 1;
@@ -159,21 +448,31 @@ import { hobbyPhotos } from "../data/hobbies";
     card.addEventListener("pointerenter", raise);
     card.addEventListener("pointerdown", (event) => {
       if (event.button !== 0) return;
-      const board = pinboard?.getBoundingClientRect();
-      const rect = card.getBoundingClientRect();
-      if (!board) return;
       active = true;
-      offsetX = event.clientX - rect.left;
-      offsetY = event.clientY - rect.top;
-      card.style.left = `${rect.left - board.left}px`;
-      card.style.top = `${rect.top - board.top}px`;
-      card.classList.add("dragging");
-      raise();
-      card.setPointerCapture(event.pointerId);
+      dragging = false;
+      ignoreClick = false;
+      startX = event.clientX;
+      startY = event.clientY;
     });
 
     card.addEventListener("pointermove", (event) => {
       if (!active || !pinboard) return;
+      const dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+      if (!dragging) {
+        if (dx * dx + dy * dy < DRAG_SLOP * DRAG_SLOP) return;
+        dragging = true;
+        const board = pinboard.getBoundingClientRect();
+        const rect = card.getBoundingClientRect();
+        offsetX = event.clientX - rect.left;
+        offsetY = event.clientY - rect.top;
+        card.style.left = `${rect.left - board.left}px`;
+        card.style.top = `${rect.top - board.top}px`;
+        card.classList.add("dragging");
+        raise();
+        card.setPointerCapture(event.pointerId);
+      }
+
       const board = pinboard.getBoundingClientRect();
       const maxX = board.width - card.offsetWidth;
       const maxY = board.height - card.offsetHeight;
@@ -183,12 +482,23 @@ import { hobbyPhotos } from "../data/hobbies";
       card.style.top = `${y}px`;
     });
 
-    const endDrag = () => {
+    const finishPointer = (cancelled: boolean) => {
+      if (dragging || cancelled) ignoreClick = true;
       active = false;
+      dragging = false;
       card.classList.remove("dragging");
     };
-    card.addEventListener("pointerup", endDrag);
-    card.addEventListener("pointercancel", endDrag);
+
+    card.addEventListener("pointerup", () => finishPointer(false));
+    card.addEventListener("pointercancel", () => finishPointer(true));
+
+    button.addEventListener("click", () => {
+      if (ignoreClick) {
+        ignoreClick = false;
+        return;
+      }
+      openLightbox(button);
+    });
   });
 
   function clampDraggedCards() {

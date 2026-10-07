@@ -1,11 +1,9 @@
 /* Theme colors and font stacks. Light and dark values live on the body below. */
 :root {
   --paper: #efe6d6;
-  --paper-deep: #e4d8c4;
   --ink: #1c1915;
   --ink-soft: #4a433a;
   --warm: #f6c98a;
-  --line: #1c1915;
   --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
   --sans: "Instrument Sans", "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;

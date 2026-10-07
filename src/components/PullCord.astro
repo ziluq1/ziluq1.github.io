@@ -328,6 +328,7 @@
   }
 
   function handlePointerDown(event: PointerEvent) {
+    if (event.button !== 0) return;
     cancelTug();
     dragging = true;
     toggledThisDrag = false;

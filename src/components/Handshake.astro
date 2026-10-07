@@ -339,8 +339,12 @@
     return count;
   }
 
+  // 1000 and above are shown as 1,000, 100,000, and 1,000,000.
   function formatCount(value: number) {
-    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 0,
+      useGrouping: true,
+    }).format(value);
   }
 
   function readCachedHandshake() {
