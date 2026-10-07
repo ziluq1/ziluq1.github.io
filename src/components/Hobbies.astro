@@ -130,7 +130,7 @@ import { hobbyPhotos } from "../data/hobbies";
 
   /* Enlarged polaroid. The frame follows the photo, within one shared size so portraits and landscapes stay in the same family. */
   .lightbox {
-    display: flex;
+    display: none;
     width: fit-content;
     max-width: calc(
       100vw - max(1.25rem, env(safe-area-inset-left)) - max(1.25rem, env(safe-area-inset-right))
@@ -147,6 +147,10 @@ import { hobbyPhotos } from "../data/hobbies";
     border: 0;
     background: transparent;
     overflow: visible;
+  }
+
+  .lightbox[open] {
+    display: flex;
   }
 
   .lightbox::backdrop {
@@ -397,8 +401,10 @@ import { hobbyPhotos } from "../data/hobbies";
     }
 
     opener = button;
-    lockScroll();
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open) {
+      lockScroll();
+      dialog.showModal();
+    }
     closeButton?.focus();
   }
 

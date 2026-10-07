@@ -406,8 +406,11 @@
         cacheHandshake(handshakeTotal);
         renderHandshake(true);
         return;
-      } catch {
-        /* Retry once, then keep the last shared count. */
+      } catch (error) {
+        // Retry only when the request never reached the counter. A timeout or
+        // response may already have added 1, so a second hit would count twice.
+        const neverSent = error instanceof TypeError;
+        if (!neverSent || attempt === 1) break;
       }
     }
     renderHandshake(false);

@@ -351,10 +351,15 @@
     }
   }
 
-  function handlePointerUp() {
+  function handlePointerUp(event: PointerEvent) {
     if (!dragging) return;
     dragging = false;
     pullGroup?.classList.remove("dragging");
+    // A cancelled touch should spring back without switching the lights.
+    if (event.type === "pointercancel") {
+      springBack();
+      return;
+    }
     const clicked = moved < CLICK_SLOP;
     if (!toggledThisDrag) toggleTheme();
     if (clicked) playTug();
