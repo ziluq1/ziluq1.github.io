@@ -1,6 +1,6 @@
 # Evan Ye
 
-Computer science portfolio.
+My portfolio.
 
 Live site: https://ziluq1.github.io/
 
