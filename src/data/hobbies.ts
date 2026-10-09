@@ -52,10 +52,6 @@ const hobbyPhotoEntries = [
     description: "Double rainbow at Yale.",
   },
   {
-    src: "/images/s-blob-v1-IMAGE-BugSMBS0JrQ.jpg",
-    location: "Yellowstone National Park",
-  },
-  {
     src: "/images/s-blob-v1-IMAGE-93l_-7CG640.jpg",
     location: "East Rock, New Haven, CT",
   },

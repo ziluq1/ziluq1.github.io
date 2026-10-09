@@ -28,6 +28,6 @@ function allowInlinePageScripts() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://ziluq1.github.io",
+  site: "https://evan-ye.com",
   integrations: [allowInlinePageScripts()],
 });
