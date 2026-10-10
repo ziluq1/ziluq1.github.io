@@ -1,4 +1,6 @@
-/* Theme colors and font stacks. Light and dark values live on the body below. */
+/* Theme colors and font stacks. Light and dark values live on the body below.
+   Widths used in media queries: 700px phones, 768px hero stack, 1024px project cards,
+   1100px hobby tablet scramble, 1600px wide-screen content cap. */
 :root {
   --paper: #efe6d6;
   --ink: #1c1915;
@@ -30,6 +32,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  min-height: 100dvh;
 }
 
 body {
@@ -85,11 +88,13 @@ img {
 
 a {
   color: inherit;
+  touch-action: manipulation;
 }
 
 button {
   font: inherit;
   color: inherit;
+  touch-action: manipulation;
 }
 
 ::selection {
@@ -147,6 +152,13 @@ h2 {
       max(1.1rem, env(safe-area-inset-right))
       2.5rem
       max(1.1rem, env(safe-area-inset-left));
+  }
+}
+
+@media (min-width: 1600px) {
+  .panel {
+    padding-left: max(6vw, env(safe-area-inset-left), calc((100vw - 80rem) / 2));
+    padding-right: max(6vw, env(safe-area-inset-right), calc((100vw - 80rem) / 2));
   }
 }
 

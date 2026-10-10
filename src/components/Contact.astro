@@ -72,9 +72,11 @@ import { EMAIL, GMAIL_URL, LINKEDIN_URL, RESUME_PATH } from "../data/site";
     stroke-linejoin: round;
   }
 
-  .contact-btn:hover {
-    transform: translateY(-2px);
-    background: rgba(0, 0, 0, 0.05);
+  @media (hover: hover) {
+    .contact-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(0, 0, 0, 0.05);
+    }
   }
 
   .contact-btn:focus-visible {
@@ -87,8 +89,10 @@ import { EMAIL, GMAIL_URL, LINKEDIN_URL, RESUME_PATH } from "../data/site";
     color: #fff;
   }
 
-  :global(body[data-theme="dark"]) .contact-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+  @media (hover: hover) {
+    :global(body[data-theme="dark"]) .contact-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
   }
 
   :global(body[data-theme="dark"]) .contact-btn:focus-visible {

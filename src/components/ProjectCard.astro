@@ -72,10 +72,12 @@ const technologies = Array.isArray(project.technologies)
       border-color 180ms ease;
   }
 
-  .project-card:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in srgb, var(--fg) 32%, transparent);
-    box-shadow: 0 14px 28px rgba(28, 25, 21, 0.12);
+  @media (hover: hover) {
+    .project-card:hover {
+      transform: translateY(-4px);
+      border-color: color-mix(in srgb, var(--fg) 32%, transparent);
+      box-shadow: 0 14px 28px rgba(28, 25, 21, 0.12);
+    }
   }
 
   .project-media {
@@ -131,12 +133,17 @@ const technologies = Array.isArray(project.technologies)
   }
 
   .project-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     text-decoration: none;
   }
 
-  .project-links a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  @media (hover: hover) {
+    .project-links a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
   }
 
   .project-links a:focus-visible {

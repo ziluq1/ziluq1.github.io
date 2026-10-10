@@ -164,7 +164,7 @@
 
   @media (max-height: 520px) {
     .pull-group {
-      height: calc(min(200px, 46vh) + var(--pull));
+      height: calc(min(200px, 46dvh) + var(--pull));
     }
   }
 
@@ -199,6 +199,9 @@
   const pull = document.getElementById("pull");
   const stars = document.getElementById("stars");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lowPower =
+    window.matchMedia("(pointer: coarse)").matches ||
+    Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
 
   let dragging = false;
   let startX = 0;
@@ -248,13 +251,13 @@
   function queueMeteor() {
     if (reducedMotion) return;
     spawnMeteor();
-    meteorTimer = window.setTimeout(queueMeteor, rand(180, 900));
+    meteorTimer = window.setTimeout(queueMeteor, lowPower ? rand(700, 1600) : rand(180, 900));
   }
 
   function showerStars() {
     stopMeteors();
     if (reducedMotion) return;
-    const burst = 8 + Math.floor(rand(0, 14));
+    const burst = lowPower ? 4 + Math.floor(rand(0, 5)) : 8 + Math.floor(rand(0, 14));
     for (let i = 0; i < burst; i += 1) spawnMeteor();
     queueMeteor();
   }

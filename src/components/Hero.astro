@@ -7,22 +7,23 @@ import PullCord from "./PullCord.astro";
 <section class="hero" id="top">
   <PullCord />
 
-  <div class="fixture">
-    <div class="glow" aria-hidden="true"></div>
-    <div class="lamp">
-      <div class="plaque">
-        <img src={PROFILE_IMAGE_PATH} alt="Photo of Evan Ye" />
+  <div class="hero-main">
+    <div class="fixture">
+      <div class="glow" aria-hidden="true"></div>
+      <div class="lamp">
+        <div class="plaque">
+          <img src={PROFILE_IMAGE_PATH} alt="Photo of Evan Ye" />
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="intro">
-    <p class="kicker">Computer Science</p>
-    <h1>Evan Ye</h1>
-    <p class="lede">
-      Hi! I’m Evan, a Yale Computer Science undergraduate who likes to build things, solve problems,<span class="lede-gap">&nbsp;</span><br class="lede-break" />
-      and mess around with code.
-    </p>
+    <div class="intro">
+      <p class="kicker">Computer Science & Math</p>
+      <h1>Evan Ye</h1>
+      <p class="lede">
+        Hi! I’m Evan, a Yale ’30 student from Louisiana studying Computer Science & Math. I enjoy coding, building projects, and making games. Outside of tech, I like playing squash or tennis, hiking, traveling, and listening to music
+      </p>
+    </div>
   </div>
 </section>
 
@@ -37,8 +38,17 @@ import PullCord from "./PullCord.astro";
     padding:
       0
       max(6vw, env(safe-area-inset-right))
-      1rem
+      4.75rem
       max(6vw, env(safe-area-inset-left));
+  }
+
+  .hero-main {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    align-items: center;
+    gap: 4.25rem;
+    width: min(1000px, 100%);
+    margin: 2.75rem auto 0;
   }
 
   .glow {
@@ -55,8 +65,9 @@ import PullCord from "./PullCord.astro";
 
   .fixture {
     position: relative;
-    width: 220px;
-    margin: 2.75rem auto 0;
+    width: 100%;
+    margin: 0;
+    transform: translateY(-1.35rem);
   }
 
   .lamp {
@@ -73,12 +84,14 @@ import PullCord from "./PullCord.astro";
     color: #1c1915;
     box-shadow:
       0 18px 50px rgba(0, 0, 0, 0.28),
-      0 2px 0 rgba(255, 255, 255, 0.35) inset;
+      0 2px 0 rgba(255, 255, 255, 0.35) inset,
+      var(--plaque-halo, 0 0 0 transparent);
     transition:
       filter 700ms ease,
       background 700ms ease,
       color 700ms ease,
-      transform 500ms ease;
+      transform 500ms ease,
+      box-shadow 700ms ease;
   }
 
   .plaque img {
@@ -89,71 +102,93 @@ import PullCord from "./PullCord.astro";
   }
 
   :global(body[data-theme="dark"]) .plaque {
-    background: #14151c;
-    color: #f3ecdf;
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    --plaque-halo:
+      0 0 28px rgba(255, 255, 255, 0.08),
+      0 16px 56px rgba(180, 200, 255, 0.15);
+  }
+
+  :global(body[data-theme="dark"]) .glow {
+    width: 165%;
+    height: 165%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(180, 200, 255, 0.28),
+      rgba(255, 255, 255, 0.1) 38%,
+      transparent 68%
+    );
   }
 
   .intro {
-    width: min(45rem, 100%);
-    margin: 2.4rem auto 0;
-    text-align: center;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    text-align: left;
   }
 
   .lede {
-    margin: 0 auto;
-    max-width: min(44rem, 100%);
+    margin: 0;
+    max-width: 55ch;
     line-height: 1.55;
     text-align: left;
     color: var(--muted);
     overflow-wrap: break-word;
   }
 
-  /* The gap is only for phones. Wider screens break the line instead. */
-  .lede-gap {
-    display: none;
-  }
-
-  /* Phones wrap the sentence. Wider screens keep the second line starting at the left. */
-  @media (max-width: 700px) {
-    .lede-gap {
-      display: inline;
-    }
-
-    .lede-break {
-      display: none;
-    }
-
-    .lede {
-      text-wrap: pretty;
+  @media (max-width: 768px) {
+    .hero-main {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 2.4rem;
+      margin-top: 0;
     }
 
     .fixture {
       width: 168px;
-      margin: 5.5rem auto 0;
-    }
-
-    /* Phones skip the full-screen hero so the intro sits closer to the projects. */
-    .hero {
-      min-height: auto;
-      padding-bottom: 1rem;
-    }
-  }
-
-  /* Short landscape screens keep the name on screen. */
-  @media (max-height: 520px) {
-    .hero {
-      min-height: auto;
-      padding-bottom: 1.5rem;
-    }
-
-    .fixture {
-      width: min(168px, 36vh);
-      margin-top: 0.6rem;
+      margin-top: 5.5rem;
     }
 
     .intro {
-      margin-top: 1.1rem;
+      text-align: center;
+    }
+
+    .lede {
+      margin-inline: auto;
+      text-align: center;
+      text-wrap: pretty;
+    }
+
+    .hero {
+      min-height: auto;
+      padding-bottom: 3.25rem;
+    }
+  }
+
+  /* Short landscape phones and small tablets keep the name on screen. */
+  @media (max-width: 1024px) and (max-height: 520px) {
+    .hero-main {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 1.1rem;
+      margin-top: 0.6rem;
+    }
+
+    .fixture {
+      width: min(168px, 36dvh);
+      margin-top: 0;
+    }
+
+    .intro,
+    .lede {
+      text-align: center;
+    }
+
+    .lede {
+      margin-inline: auto;
+    }
+
+    .hero {
+      min-height: auto;
+      padding-bottom: 1.5rem;
     }
   }
 </style>
