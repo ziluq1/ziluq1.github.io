@@ -3,7 +3,8 @@ import { hobbyPhotos } from "../data/hobbies";
 ---
 
 <section class="panel hobbies" id="hobbies">
-  <h2 class="kicker">A collection of memories</h2>
+  <h2 class="kicker">Photography</h2>
+  <p class="hobbies-sub">A collection of memories</p>
   <div class="pinboard" id="pinboard">
     {
       hobbyPhotos.map((photo) => (
@@ -45,7 +46,7 @@ import { hobbyPhotos } from "../data/hobbies";
 
 <style>
   .hobbies {
-    padding-top: 4.1rem;
+    padding-top: 2.5rem;
   }
 
   .hobbies > .kicker {
@@ -56,6 +57,14 @@ import { hobbyPhotos } from "../data/hobbies";
     line-height: 1.45;
     margin: 0;
     overflow-wrap: anywhere;
+  }
+
+  .hobbies-sub {
+    margin: 0.45rem 0 0;
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+    line-height: 1.35;
+    color: var(--muted);
   }
 
   .pinboard {
@@ -323,7 +332,7 @@ import { hobbyPhotos } from "../data/hobbies";
 
   @media (max-width: 700px) {
     .hobbies {
-      padding-top: 1.9rem;
+      padding-top: 1.2rem;
       padding-bottom: 1.15rem;
     }
 
