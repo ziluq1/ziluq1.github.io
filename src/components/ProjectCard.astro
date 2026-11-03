@@ -14,6 +14,7 @@ function filled(value?: string) {
 const image = filled(project.image) ? project.image!.trim() : "";
 const github = filled(project.github) ? project.github!.trim() : "";
 const demo = filled(project.demo) ? project.demo!.trim() : "";
+const imageFit = project.imageFit === "contain" ? "contain" : "cover";
 const technologies = Array.isArray(project.technologies)
   ? project.technologies.map((item) => item.trim()).filter(Boolean)
   : [];
@@ -21,7 +22,7 @@ const technologies = Array.isArray(project.technologies)
 
 <!-- One card. Empty image, GitHub, demo, and technology fields are left out. -->
 <article class="project-card">
-  <div class="project-media">
+  <div class="project-media" data-fit={image ? imageFit : undefined}>
     {
       image ? (
         <img src={image} alt={project.imageAlt?.trim() || project.title} />
@@ -81,7 +82,8 @@ const technologies = Array.isArray(project.technologies)
   }
 
   .project-media {
-    min-height: 240px;
+    min-height: 0;
+    height: clamp(11.5rem, 32vw, 20rem);
     display: grid;
     place-items: center;
     padding: 1rem;
@@ -91,12 +93,28 @@ const technologies = Array.isArray(project.technologies)
     font-size: 0.72rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    overflow: hidden;
+  }
+
+  .project-media[data-fit="contain"] {
+    background: #efe6d6;
+    padding: 1.1rem;
   }
 
   .project-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .project-media[data-fit="contain"] img {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    justify-self: center;
+    align-self: center;
+    object-fit: contain;
+    object-position: center;
   }
 
   .project-copy {
@@ -163,7 +181,13 @@ const technologies = Array.isArray(project.technologies)
 
   @media (max-width: 700px) {
     .project-media {
-      min-height: 180px;
+      height: 11.25rem;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .project-media {
+      height: 20rem;
     }
   }
 

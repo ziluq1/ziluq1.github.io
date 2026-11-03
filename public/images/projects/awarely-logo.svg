@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 128" role="img" aria-label="awarely.ai">
+  <svg x="0" y="0" width="128" height="128" viewBox="0 0 32 32">
+    <rect width="32" height="32" rx="8" fill="#3f345c"/>
+    <text x="16" y="21.6" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', Times, serif" font-size="22" fill="#efe6d6">A</text>
+  </svg>
+  <text x="148" y="58" font-family="Georgia, 'Iowan Old Style', Times, serif" font-size="42" fill="#3f345c">awarely.ai</text>
+  <text x="148" y="94" font-family="Georgia, 'Iowan Old Style', Times, serif" font-size="18" fill="#3f345c">A quiet journal</text>
+</svg>
