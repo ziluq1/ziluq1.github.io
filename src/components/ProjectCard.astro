@@ -1,5 +1,6 @@
 ---
 import type { Project } from "../data/projects";
+import AwarelyLogo from "./AwarelyLogo.astro";
 
 interface Props {
   project: Project;
@@ -12,9 +13,11 @@ function filled(value?: string) {
 }
 
 const image = filled(project.image) ? project.image!.trim() : "";
+const imageDark = filled(project.imageDark) ? project.imageDark!.trim() : "";
 const github = filled(project.github) ? project.github!.trim() : "";
 const demo = filled(project.demo) ? project.demo!.trim() : "";
 const imageFit = project.imageFit === "contain" ? "contain" : "cover";
+const imageAlt = project.imageAlt?.trim() || project.title;
 const technologies = Array.isArray(project.technologies)
   ? project.technologies.map((item) => item.trim()).filter(Boolean)
   : [];
@@ -24,8 +27,17 @@ const technologies = Array.isArray(project.technologies)
 <article class="project-card">
   <div class="project-media" data-fit={image ? imageFit : undefined}>
     {
-      image ? (
-        <img src={image} alt={project.imageAlt?.trim() || project.title} />
+      project.markCycle ? (
+        <AwarelyLogo />
+      ) : image ? (
+        imageDark ? (
+          <>
+            <img class="project-logo-light" src={image} alt={imageAlt} />
+            <img class="project-logo-dark" src={imageDark} alt="" aria-hidden="true" />
+          </>
+        ) : (
+          <img src={image} alt={imageAlt} />
+        )
       ) : (
         project.status && <span>{project.status}</span>
       )
@@ -97,8 +109,20 @@ const technologies = Array.isArray(project.technologies)
   }
 
   .project-media[data-fit="contain"] {
-    background: #efe6d6;
+    background: var(--bg);
     padding: 1.1rem;
+  }
+
+  .project-logo-dark {
+    display: none;
+  }
+
+  :global(body[data-theme="dark"]) .project-logo-light {
+    display: none;
+  }
+
+  :global(body[data-theme="dark"]) .project-logo-dark {
+    display: block;
   }
 
   .project-media img {

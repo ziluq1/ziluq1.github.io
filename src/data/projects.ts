@@ -7,8 +7,10 @@ export type Project = {
   status?: string;
   description?: string;
   image?: string;
+  imageDark?: string;
   imageAlt?: string;
   imageFit?: "contain" | "cover";
+  markCycle?: boolean;
   year?: string;
   technologies?: string[];
   github?: string;
@@ -21,8 +23,10 @@ export const projects: Project[] = [
     description:
       "A private journaling app with an AI companion for grounding and self-reflection.",
     image: "/images/projects/awarely-logo.svg",
+    imageDark: "/images/projects/awarely-logo-dark.svg",
     imageAlt: "Awarely AI logo",
     imageFit: "contain",
+    markCycle: true,
     year: "2026",
     technologies: ["Next.js", "Supabase", "Vercel"],
     github: "https://github.com/ziluq1/awarely-ai",

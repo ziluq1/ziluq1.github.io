@@ -1,0 +1,117 @@
+---
+---
+
+<!-- Click the A to walk Awarely's cream, sage, and lavender, then return to purple. -->
+<div class="awarely-lockup">
+  <svg class="awarely-logo" viewBox="0 0 400 128" role="img" aria-label="awarely.ai">
+    <svg x="0" y="0" width="128" height="128" viewBox="0 0 32 32">
+      <rect class="awarely-sq" width="32" height="32" rx="8" fill="#3f345c" />
+      <text
+        class="awarely-a"
+        x="16"
+        y="21.6"
+        text-anchor="middle"
+        font-family="Georgia, 'Iowan Old Style', Times, serif"
+        font-size="22"
+        fill="#efe6d6"
+      >A</text>
+    </svg>
+    <text class="awarely-word" x="148" y="58" font-family="Georgia, 'Iowan Old Style', Times, serif" font-size="42">awarely.ai</text>
+    <text class="awarely-tag" x="148" y="94" font-family="Georgia, 'Iowan Old Style', Times, serif" font-size="18">A quiet journal</text>
+  </svg>
+  <button class="awarely-swatch" type="button" aria-label="Cycle the A color"></button>
+</div>
+
+<script>
+  const palettes = [
+    { tile: "#3f345c", letter: "#efe6d6" },
+    { tile: "#f7f3ec", letter: "#3f345c" },
+    { tile: "#e5f0e6", letter: "#1e4634" },
+    { tile: "#ebe4f6", letter: "#3f345c" },
+    { tile: "#e5f0e6", letter: "#1e4634" },
+  ];
+
+  for (const button of document.querySelectorAll(".awarely-swatch")) {
+    const root = button.closest(".awarely-lockup");
+    const sq = root?.querySelector(".awarely-sq");
+    const letter = root?.querySelector(".awarely-a");
+    if (!root || !sq || !letter) continue;
+
+    let index = 0;
+
+    function paint() {
+      const next = palettes[index];
+      sq.setAttribute("fill", next.tile);
+      letter.setAttribute("fill", next.letter);
+    }
+
+    button.addEventListener("click", () => {
+      index = (index + 1) % palettes.length;
+      paint();
+    });
+  }
+</script>
+
+<style>
+  .awarely-lockup {
+    position: relative;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    justify-self: center;
+    align-self: center;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .awarely-logo {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+  }
+
+  .awarely-sq,
+  .awarely-a {
+    transition: fill 220ms ease;
+  }
+
+  .awarely-word,
+  .awarely-tag {
+    fill: #3f345c;
+  }
+
+  :global(body[data-theme="dark"]) .awarely-word {
+    fill: #f4efe6;
+  }
+
+  :global(body[data-theme="dark"]) .awarely-tag {
+    fill: #d2c8b6;
+  }
+
+  .awarely-swatch {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 32%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 25%;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .awarely-swatch:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .awarely-sq,
+    .awarely-a {
+      transition: none;
+    }
+  }
+</style>
